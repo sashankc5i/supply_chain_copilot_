@@ -1,0 +1,51 @@
+# Generated synthetic data + runtime logs
+data/raw/
+data/runtime/
+data/processed/
+
+# Evaluation outputs
+eval/eval_results.json
+eval/eval_results.md
+
+# Secrets
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build / dist
+build/
+dist/
+*.egg
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
+*.log

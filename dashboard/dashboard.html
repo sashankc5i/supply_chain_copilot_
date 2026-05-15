@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Supply Chain Command Center — Wireframe</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2030;
+      --panel-2: #232b3d;
+      --text: #e6e9ef;
+      --muted: #8a93a6;
+      --high: #ff5d6c;
+      --medium: #ffb648;
+      --low: #5bd1a3;
+      --accent: #5b8def;
+      --border: #2a3142;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); font-size: 14px;
+    }
+    header {
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+    .kpis { display: flex; gap: 32px; }
+    .kpi { text-align: right; }
+    .kpi-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 20px; font-weight: 600; margin-top: 2px; }
+
+    main { display: grid; grid-template-columns: 320px 1fr 360px; gap: 1px; background: var(--border); min-height: calc(100vh - 65px); }
+    aside, section { background: var(--bg); padding: 20px; overflow-y: auto; }
+    h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+
+    .alert-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s;
+    }
+    .alert-card:hover { border-color: var(--accent); }
+    .alert-card.active { border-color: var(--accent); background: var(--panel-2); }
+    .alert-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .sku { font-weight: 600; }
+    .severity { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; letter-spacing: 0.5px; }
+    .sev-HIGH { background: var(--high); color: white; }
+    .sev-MEDIUM { background: var(--medium); color: #1a1300; }
+    .sev-LOW { background: var(--low); color: #003a25; }
+    .alert-meta { color: var(--muted); font-size: 12px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .panel-title { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+    .evidence-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+    .evidence-row:last-child { border-bottom: none; }
+    .ev-source { color: var(--accent); font-weight: 600; }
+    .ev-impact { color: var(--text); }
+    .ev-confidence { color: var(--muted); font-size: 12px; }
+    .conf-bar { display: inline-block; width: 60px; height: 4px; background: var(--border); border-radius: 2px; vertical-align: middle; margin-left: 8px; }
+    .conf-bar > span { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+
+    table.recs { width: 100%; border-collapse: collapse; }
+    table.recs th, table.recs td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+    table.recs th { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .verdict-approved { color: var(--low); }
+    .verdict-rejected { color: var(--high); }
+    .verdict-flagged  { color: var(--medium); }
+
+    .hypothesis { padding: 10px 12px; background: var(--panel-2); border-left: 3px solid var(--accent); border-radius: 4px; margin-bottom: 8px; }
+    .hyp-cause { font-weight: 600; }
+    .hyp-conf { color: var(--muted); font-size: 12px; float: right; }
+    .hyp-expl { margin-top: 4px; color: var(--text); font-size: 13px; line-height: 1.4; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; width: 480px; }
+    .modal h3 { margin: 0 0 12px; }
+    .modal-row { margin-bottom: 10px; }
+    .modal-row label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .modal-row input, .modal-row textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px; font-family: inherit; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+    button { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    button.reject { background: var(--high); }
+    button.edit   { background: var(--medium); color: #1a1300; }
+    button.ghost  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .trace-link { color: var(--accent); font-size: 12px; text-decoration: none; }
+    .trace-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Supply Chain Command Center · <span style="color: var(--muted); font-weight: 400;">Day-1 Wireframe</span></h1>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-label">Alerts Today</div><div class="kpi-value">37</div></div>
+    <div class="kpi"><div class="kpi-label">Stockout Risk</div><div class="kpi-value" style="color: var(--high);">12%</div></div>
+    <div class="kpi"><div class="kpi-label">HITL Queue</div><div class="kpi-value">4</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Latency</div><div class="kpi-value">28s</div></div>
+  </div>
+</header>
+
+<main>
+  <!-- Alert list -->
+  <aside>
+    <h2>Alerts</h2>
+    <div class="alert-card active">
+      <div class="alert-head">
+        <span class="sku">SKU-1042</span>
+        <span class="severity sev-HIGH">HIGH</span>
+      </div>
+      <div class="alert-meta">West · Week 87 · DOH 3.1d · z +3.4</div>
+    </div>
+    <div class="alert-card">
+      <div class="alert-head">
+        <span class="sku">SKU-0217</span>
+        <span class="severity sev-HIGH">HIGH</span>
+      </div>
+      <div class="alert-meta">South · Week 89 · DOH 4.8d · z -2.6</div>
+    </div>
+    <div class="alert-card">
+      <div class="alert-head">
+        <span class="sku">SKU-0089</span>
+        <span class="severity sev-MEDIUM">MED</span>
+      </div>
+      <div class="alert-meta">East · Week 91 · DOH 18.0d · z +2.4</div>
+    </div>
+    <div class="alert-card">
+      <div class="alert-head">
+        <span class="sku">SKU-0631</span>
+        <span class="severity sev-LOW">LOW</span>
+      </div>
+      <div class="alert-meta">Central · Week 92 · DOH 11.2d</div>
+    </div>
+  </aside>
+
+  <!-- Center panel: evidence + diagnosis + recommendations -->
+  <section>
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+      <h2 style="margin: 0;">SKU-1042 · West Region · Week 87</h2>
+      <a class="trace-link" href="#">View LangSmith trace →</a>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Evidence</div>
+      <div class="evidence-row">
+        <span class="ev-source">Promotion Calendar</span>
+        <span class="ev-impact">+40% BOGO lift, in-store</span>
+        <span class="ev-confidence">0.95 <span class="conf-bar"><span style="width: 95%;"></span></span></span>
+      </div>
+      <div class="evidence-row">
+        <span class="ev-source">Weather Events</span>
+        <span class="ev-impact">Regional heatwave +12% (Beverage)</span>
+        <span class="ev-confidence">0.82 <span class="conf-bar"><span style="width: 82%;"></span></span></span>
+      </div>
+      <div class="evidence-row">
+        <span class="ev-source">Supplier Status</span>
+        <span class="ev-impact">No active delays</span>
+        <span class="ev-confidence">0.99 <span class="conf-bar"><span style="width: 99%;"></span></span></span>
+      </div>
+      <div class="evidence-row">
+        <span class="ev-source">Demand History</span>
+        <span class="ev-impact">+120% WoW vs trailing 8w mean</span>
+        <span class="ev-confidence">1.00 <span class="conf-bar"><span style="width: 100%;"></span></span></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Root-Cause Hypotheses</div>
+      <div class="hypothesis">
+        <span class="hyp-cause">promo_effect</span>
+        <span class="hyp-conf">confidence 0.85</span>
+        <div class="hyp-expl">2x promo on SKU-1042 in West region (BOGO, in-store) explains majority of the spike.</div>
+      </div>
+      <div class="hypothesis">
+        <span class="hyp-cause">weather_event</span>
+        <span class="hyp-conf">confidence 0.62</span>
+        <div class="hyp-expl">Regional heatwave increases beverage demand; compounding effect on top of promo.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Recommendations</div>
+      <table class="recs">
+        <thead>
+          <tr><th>Action</th><th>Params</th><th>Cost</th><th>Confidence</th><th>DOH Δ</th><th>Critique</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>transfer_inventory</td>
+            <td>200 units from East DC + 200 from Central DC → ST-007</td>
+            <td>$1,240</td>
+            <td>0.88</td>
+            <td>+5.4d</td>
+            <td class="verdict-approved">approved</td>
+          </tr>
+          <tr>
+            <td>expedite_order</td>
+            <td>1,000 units, SUP-9001, 3d lead time</td>
+            <td>$3,420</td>
+            <td>0.71</td>
+            <td>+7.1d</td>
+            <td class="verdict-flagged">flagged (budget)</td>
+          </tr>
+          <tr>
+            <td>reduce_promo</td>
+            <td>Cap BOGO at 75% redemption</td>
+            <td>$0</td>
+            <td>0.45</td>
+            <td>+2.1d</td>
+            <td class="verdict-rejected">rejected (sales loss)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HITL approval modal mock -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <h3>HITL Approval · SKU-1042</h3>
+      <div class="modal-row">
+        <label>Top recommended action</label>
+        <div>Transfer 400 units (200 East DC + 200 Central DC) to ST-007</div>
+      </div>
+      <div class="modal-row">
+        <label>Estimated cost</label>
+        <input value="$1,240" />
+      </div>
+      <div class="modal-row">
+        <label>Override quantity (optional)</label>
+        <input placeholder="e.g. 300" />
+      </div>
+      <div class="modal-row">
+        <label>Notes</label>
+        <textarea rows="2" placeholder="Reason for reject/edit..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="ghost">Cancel</button>
+        <button class="reject">Reject</button>
+        <button class="edit">Edit &amp; Re-Critique</button>
+        <button>Approve</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
