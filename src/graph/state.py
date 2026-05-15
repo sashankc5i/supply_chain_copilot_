@@ -69,6 +69,11 @@ class CritiqueResult(TypedDict):
 
 
 class SupplyChainState(TypedDict, total=False):
+    # Run controls (must be in schema or LangGraph drops them before detect runs)
+    week_start:            str                    # ISO Monday "YYYY-MM-DD"
+    sku_id:                str                    # optional focal SKU filter
+    store_id:              str                    # optional focal store filter
+    run_id:                str
     demand_signals:        list[DemandSignal]
     inventory_positions:   dict                   # sku_id -> {location_id: row}
     service_levels:        dict                   # sku_id -> fill_rate float
@@ -79,4 +84,3 @@ class SupplyChainState(TypedDict, total=False):
     approval_status:       ApprovalStatus
     exceptions:            list[str]
     retry_count:           int
-    run_id:                str

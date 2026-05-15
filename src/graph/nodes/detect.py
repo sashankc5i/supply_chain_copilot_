@@ -59,7 +59,7 @@ def detect(state: SupplyChainState) -> dict:
         & (demand["week_start"] <= target_week)
     ]
     if window.empty:
-        return {"demand_signals": [], "inventory_positions": {}}
+        return {"week_start": week_str, "demand_signals": [], "inventory_positions": {}}
 
     trailing = window[window["week_start"] < target_week]
     stats = (
@@ -70,7 +70,7 @@ def detect(state: SupplyChainState) -> dict:
 
     current = window[window["week_start"] == target_week].copy()
     if current.empty:
-        return {"demand_signals": [], "inventory_positions": {}}
+        return {"week_start": week_str, "demand_signals": [], "inventory_positions": {}}
 
     current = current.merge(stats, on=["sku_id", "store_id"], how="left")
     current["zscore"] = (
@@ -82,7 +82,7 @@ def detect(state: SupplyChainState) -> dict:
         (current["zscore"].abs() > Z_THRESHOLD) | (current["units_sold"] == 0)
     ].copy()
     if flagged.empty:
-        return {"demand_signals": [], "inventory_positions": {}}
+        return {"week_start": week_str, "demand_signals": [], "inventory_positions": {}}
 
     inv_store = inventory[inventory["location_type"] == "store"][[
         "sku_id", "location_id", "units_on_hand", "days_on_hand",
@@ -128,7 +128,11 @@ def detect(state: SupplyChainState) -> dict:
             "safety_stock": int(r.safety_stock),
         }
 
-    return {"demand_signals": signals, "inventory_positions": positions}
+    return {
+        "week_start": week_str,
+        "demand_signals": signals,
+        "inventory_positions": positions,
+    }
 
 
 def _severity(doh: float) -> str:

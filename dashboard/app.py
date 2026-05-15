@@ -3,23 +3,16 @@
 Run from project root:
     streamlit run dashboard/app.py
 
-Phase 2 scope:
-    - Sidebar scenario picker (3 demo scenarios + custom week)
-    - Pipeline run: detect -> retrieve_evidence -> diagnose
-    - Alert list (filterable by severity)
-    - Focal-alert detail panel with evidence cards + ranked hypotheses
-
-Phase 3 will add HITL approval + what-if pages under dashboard/pages/.
+Phase 3: full graph pipeline + recommendations + critique + HITL (via FastAPI).
 """
 from __future__ import annotations
 
 import sys
 import time
+import uuid
 from datetime import date
 from pathlib import Path
 
-# Put project root on sys.path so `src.*` and `dashboard.*` imports resolve
-# regardless of how Streamlit is invoked.
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -35,16 +28,24 @@ st.set_page_config(
     layout="wide",
 )
 
-# Imports after st.set_page_config + sys.path setup.
 from dashboard.components.alert_card import render_alert_card
 from dashboard.components.evidence_panel import render_evidence_panel
-from src.graph.nodes.detect import detect
-from src.graph.nodes.diagnose import diagnose
-from src.graph.nodes.retrieve_evidence import retrieve_evidence
+from dashboard.components.recommendation_table import render_recommendation_table
+from src.api.routes.alerts import set_latest_alerts
+from src.graph.graph import app as graph_app
+
+
+def _thread_config(run_id: str) -> dict:
+    return {"configurable": {"thread_id": run_id}}
+
+
+def _is_interrupted(run_id: str) -> bool:
+    snap = graph_app.get_state(_thread_config(run_id))
+    return bool(snap and snap.tasks)
 
 
 # ---------------------------------------------------------------------------
-# Sidebar -- scenario selection + pipeline controls
+# Sidebar
 # ---------------------------------------------------------------------------
 st.sidebar.title("Pipeline Run")
 
@@ -54,6 +55,11 @@ SCENARIOS = {
     "Demo 3 — SKU-0089 borderline (East, Wk91)": "2026-02-09",
     "Latest week (anchor, Wk104)":               "2026-05-11",
     "Custom":                                    None,
+}
+DEMO_SKU = {
+    "Demo 1 — SKU-1042 spike (West, Wk87)": "SKU-1042",
+    "Demo 2 — SKU-0217 drop  (South, Wk89)": "SKU-0217",
+    "Demo 3 — SKU-0089 borderline (East, Wk91)": "SKU-0089",
 }
 
 choice = st.sidebar.radio("Scenario", list(SCENARIOS.keys()))
@@ -65,17 +71,12 @@ else:
     chosen_date = st.sidebar.date_input("Week start (Monday)", value=date(2026, 1, 12))
     week_start = chosen_date.isoformat()
 
-run_diagnose = st.sidebar.checkbox(
-    "Run LLM diagnosis (slower, costs tokens)", value=True,
-    help="Toggle off to run only detect (pure pandas) for a fast view of the alert list.",
-)
-
 run = st.sidebar.button("▶ Run pipeline", type="primary", use_container_width=True)
 
 st.sidebar.divider()
 st.sidebar.caption(
-    "**Pipeline:** detect → retrieve_evidence → diagnose. "
-    "Recommend, critique, escalate ship in Phase 3."
+    "Pipeline: detect → [evidence → diagnose → recommend → critique → escalate] "
+    "or summarize. Start FastAPI for HITL buttons."
 )
 
 # ---------------------------------------------------------------------------
@@ -83,68 +84,99 @@ st.sidebar.caption(
 # ---------------------------------------------------------------------------
 if "state" not in st.session_state:
     st.session_state.state = None
+    st.session_state.run_id = None
     st.session_state.week_start = None
     st.session_state.timings = {}
+    st.session_state.interrupted = False
 
 if run:
+    run_id = f"st-{uuid.uuid4().hex[:12]}"
     timings: dict[str, float] = {}
-    state: dict = {"run_id": f"st-{week_start}-{int(time.time())}", "week_start": week_start}
+    config = _thread_config(run_id)
+    inputs: dict = {"run_id": run_id, "week_start": week_start}
+    demo_sku = DEMO_SKU.get(choice)
+    if demo_sku:
+        inputs["sku_id"] = demo_sku
 
-    with st.spinner("Detecting anomalies..."):
-        t0 = time.perf_counter()
-        state.update(detect(state))
-        timings["detect_ms"] = (time.perf_counter() - t0) * 1000
-
-    high = [s for s in state.get("demand_signals", []) if s["severity"] == "HIGH"]
-    if run_diagnose and high:
-        with st.spinner("Retrieving evidence (4 tools in parallel)..."):
-            t0 = time.perf_counter()
-            state.update(retrieve_evidence(state))
-            timings["retrieve_evidence_ms"] = (time.perf_counter() - t0) * 1000
-
-        with st.spinner("Diagnosing root cause (gpt-4o-mini)..."):
-            t0 = time.perf_counter()
-            state.update(diagnose(state))
-            timings["diagnose_ms"] = (time.perf_counter() - t0) * 1000
-
-    st.session_state.state = state
-    st.session_state.week_start = week_start
-    st.session_state.timings = timings
-
+    t0 = time.perf_counter()
+    try:
+        with st.spinner("Running LangGraph pipeline..."):
+            result = graph_app.invoke(inputs, config=config)
+        timings["pipeline_ms"] = (time.perf_counter() - t0) * 1000
+        interrupted = _is_interrupted(run_id)
+        state = result if isinstance(result, dict) else dict(result)
+        set_latest_alerts(run_id, state.get("demand_signals", []))
+        st.session_state.state = state
+        st.session_state.run_id = run_id
+        st.session_state.week_start = week_start
+        st.session_state.timings = timings
+        st.session_state.interrupted = interrupted
+        if interrupted:
+            st.session_state.pending_hitl = {
+                "run_id": run_id,
+                "critique": state.get("critique_result"),
+                "top_action": (state.get("critique_result") or {}).get("top_action"),
+            }
+    except Exception as exc:
+        st.error(f"Pipeline failed: {exc}")
 
 # ---------------------------------------------------------------------------
-# Main -- header, KPIs, alert list, focal detail
+# Main
 # ---------------------------------------------------------------------------
 st.title("📦 Supply Chain Command Center")
-st.caption("LangGraph Copilot · Phase 2 build · gpt-4o-mini")
+st.caption("LangGraph Copilot · Phase 3 · gpt-4o-mini")
+
+if (
+    st.session_state.state is not None
+    and st.session_state.week_start
+    and st.session_state.week_start != week_start
+):
+    st.warning(
+        f"Sidebar week is **{week_start}** but results are from "
+        f"**{st.session_state.week_start}**. Click **Run pipeline** to refresh."
+    )
 
 if st.session_state.state is None:
     st.info("👈 Pick a scenario in the sidebar and click ▶ Run pipeline.")
     st.stop()
 
 state = st.session_state.state
+run_id = st.session_state.run_id or ""
 signals = state.get("demand_signals", [])
 evidence = state.get("evidence", {})
 hypotheses = state.get("root_cause_hypotheses", [])
+recommendations = state.get("recommendations", [])
+critique = state.get("critique_result")
 timings = st.session_state.timings
+interrupted = st.session_state.interrupted
 
-# KPI row
-k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("Total Alerts", len(signals))
-k2.metric("HIGH",    sum(1 for s in signals if s["severity"] == "HIGH"))
-k3.metric("MEDIUM",  sum(1 for s in signals if s["severity"] == "MEDIUM"))
-k4.metric("LOW",     sum(1 for s in signals if s["severity"] == "LOW"))
-total_ms = sum(timings.values())
-k5.metric("Pipeline latency", f"{total_ms:.0f} ms" if total_ms else "—")
+if interrupted:
+    st.warning(
+        f"⏸ **HITL pending** — graph paused at escalate. "
+        f"Use Approve / Reject / Edit below (requires FastAPI on port 8000). "
+        f"run_id=`{run_id}`"
+    )
 
-st.caption(
-    " · ".join(f"{k}: {v:.0f}ms" for k, v in timings.items()) or
-    "(timings populate after a run)"
-)
+# KPIs
+k1, k2, k3, k4, k5, k6 = st.columns(6)
+k1.metric("Alerts", len(signals))
+k2.metric("HIGH", sum(1 for s in signals if s["severity"] == "HIGH"))
+k3.metric("MEDIUM", sum(1 for s in signals if s["severity"] == "MEDIUM"))
+k4.metric("LOW", sum(1 for s in signals if s["severity"] == "LOW"))
+k5.metric("Recs", len(recommendations))
+total_ms = timings.get("pipeline_ms", sum(timings.values()))
+k6.metric("Latency", f"{total_ms:.0f} ms" if total_ms else "—")
+
+ran_week = state.get("week_start") or st.session_state.week_start
+if ran_week:
+    st.caption(f"Pipeline week: **{ran_week}** · run_id `{run_id}`")
+
+if state.get("exceptions"):
+    for msg in state["exceptions"]:
+        st.info(msg)
 
 st.divider()
 
-# Two-column body: alert list (left) + focal diagnosis (right)
 left, right = st.columns([2, 3])
 
 with left:
@@ -162,64 +194,44 @@ with left:
         filtered.sort(key=lambda s: (sev_rank[s["severity"]], -abs(s["zscore"])))
         for s in filtered[:25]:
             render_alert_card(s)
-        if len(filtered) > 25:
-            st.caption(f"…and {len(filtered) - 25} more (sorted by severity, |z|)")
 
 with right:
-    st.subheader("Focal Alert · Diagnosis")
+    st.subheader("Focal Alert · Diagnosis & Actions")
     high = [s for s in signals if s["severity"] == "HIGH"]
-    if not high:
-        st.info("No HIGH-severity alerts in this run. retrieve_evidence + diagnose only fire for HIGH signals.")
+    if not high and not state.get("exceptions"):
+        st.info("No HIGH-severity alerts — summarize path only.")
     else:
-        focal = max(high, key=lambda s: abs(s["zscore"]))
-        focal_cols = st.columns([2, 1, 1, 1])
-        focal_cols[0].markdown(f"### {focal['sku_id']}")
-        focal_cols[0].caption(f"{focal['store_id']} · {focal['region']} · {focal['week_start']}")
-        focal_cols[1].metric("z-score", f"{focal['zscore']:+.2f}")
-        focal_cols[2].metric("units", focal["units_sold"])
-        focal_cols[3].metric("type", focal["anomaly_type"])
+        if high:
+            focal = max(high, key=lambda s: abs(s["zscore"]))
+            st.markdown(f"**{focal['sku_id']}** · {focal['store_id']} · {focal['region']}")
 
         if evidence:
             st.markdown("**Evidence**")
             render_evidence_panel(evidence)
 
         if hypotheses:
-            st.markdown("**Root-cause hypotheses (ranked)**")
+            st.markdown("**Root-cause hypotheses**")
             for i, h in enumerate(hypotheses, 1):
                 with st.container(border=True):
-                    title_cols = st.columns([3, 1])
-                    title_cols[0].markdown(f"**[{i}] `{h['cause_type']}`**")
-                    title_cols[1].metric("confidence", f"{h['confidence']:.2f}")
-                    st.caption(f"sources: {', '.join(h['evidence_sources']) or '(none cited)'}")
+                    st.markdown(f"**[{i}] `{h['cause_type']}`** — conf {h['confidence']:.2f}")
                     st.write(h["explanation"])
-        elif evidence:
-            st.warning("Diagnose returned no hypotheses.")
-        else:
-            st.info("Re-run with **Run LLM diagnosis** enabled to see evidence + hypotheses.")
 
-# Coming-in-Phase-3 placeholders
-st.divider()
-st.subheader("Coming in Phase 3")
-ph_cols = st.columns(3)
-with ph_cols[0]:
-    with st.container(border=True):
-        st.markdown("**Recommend**")
-        st.caption("Ranked actions with cost, confidence, DOH improvement.")
-with ph_cols[1]:
-    with st.container(border=True):
-        st.markdown("**Critique**")
-        st.caption("Deterministic constraint check (safety stock, MOQ, budget).")
-with ph_cols[2]:
-    with st.container(border=True):
-        st.markdown("**HITL**")
-        st.caption("Approve / reject / edit with action_log persistence.")
+        if recommendations or critique:
+            st.markdown("**Recommendations**")
+            render_recommendation_table(
+                recommendations, critique, run_id if interrupted else "",
+            )
+
+        if state.get("approval_status") and state["approval_status"] != "n/a":
+            st.success(f"Approval status: **{state['approval_status']}**")
 
 with st.expander("Pipeline metadata"):
     st.json({
-        "run_id": state.get("run_id"),
+        "run_id": run_id,
         "week_start": st.session_state.week_start,
+        "interrupted": interrupted,
+        "approval_status": state.get("approval_status"),
+        "retry_count": state.get("retry_count", 0),
         "n_signals": len(signals),
-        "n_evidence_sources": len(evidence),
-        "n_hypotheses": len(hypotheses),
         "timings_ms": timings,
     })
