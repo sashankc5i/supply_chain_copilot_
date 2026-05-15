@@ -1,0 +1,61 @@
+location_id,location_type,region,name,dc_id,max_capacity,transfer_cost_per_unit
+DC-001,DC,North,North DC 1,,110905,0.5
+DC-002,DC,South,South DC 2,,98807,0.85
+DC-003,DC,East,East DC 3,,104480,0.75
+DC-004,DC,West,West DC 4,,122363,0.65
+DC-005,DC,Central,Central DC 5,,129591,0.48
+DC-006,DC,North,North DC 6,,132275,0.44
+DC-007,DC,South,South DC 7,,103975,0.39
+DC-008,DC,East,East DC 8,,105799,0.82
+DC-009,DC,West,West DC 9,,80122,0.64
+DC-010,DC,Central,Central DC 10,,102659,0.78
+ST-001,store,North,North Judithbury Store 1,DC-006,6702,2.1
+ST-002,store,South,East Jill Store 2,DC-007,4857,3.49
+ST-003,store,East,New Roberttown Store 3,DC-008,6047,3.04
+ST-004,store,West,East Jessetown Store 4,DC-009,7415,2.97
+ST-005,store,Central,Lake Debra Store 5,DC-005,3111,2.41
+ST-006,store,North,Robinsonshire Store 6,DC-001,2611,2.63
+ST-007,store,South,Lisatown Store 7,DC-002,7732,2.28
+ST-008,store,East,Lake Roberto Store 8,DC-008,4597,1.09
+ST-009,store,West,Ericmouth Store 9,DC-009,7758,1.26
+ST-010,store,Central,North Noahstad Store 10,DC-005,2246,1.62
+ST-011,store,North,Cassandraton Store 11,DC-006,2393,2.14
+ST-012,store,South,Herrerafurt Store 12,DC-002,5096,1.78
+ST-013,store,East,New Kellystad Store 13,DC-003,2305,1.28
+ST-014,store,West,Lake Chad Store 14,DC-009,4307,1.15
+ST-015,store,Central,Port Keith Store 15,DC-010,6189,1.52
+ST-016,store,North,Port Jesseville Store 16,DC-006,3812,1.99
+ST-017,store,South,Ramirezstad Store 17,DC-002,4499,1.0
+ST-018,store,East,West Michael Store 18,DC-003,2672,3.16
+ST-019,store,West,Jacquelineland Store 19,DC-004,2007,2.27
+ST-020,store,Central,New Jessica Store 20,DC-005,4937,1.83
+ST-021,store,North,South Noah Store 21,DC-001,4587,2.95
+ST-022,store,South,Lake Mark Store 22,DC-002,7047,1.65
+ST-023,store,East,East Lydiamouth Store 23,DC-003,3934,1.61
+ST-024,store,West,Adamsborough Store 24,DC-009,4879,2.71
+ST-025,store,Central,Jasonfort Store 25,DC-005,3369,1.83
+ST-026,store,North,Wilkersonmouth Store 26,DC-001,7582,1.12
+ST-027,store,South,West Donald Store 27,DC-002,4764,2.78
+ST-028,store,East,Juliechester Store 28,DC-003,2902,1.12
+ST-029,store,West,Coxberg Store 29,DC-004,2829,3.3
+ST-030,store,Central,Daviston Store 30,DC-005,2055,1.47
+ST-031,store,North,East Courtneychester Store 31,DC-006,2187,1.28
+ST-032,store,South,South Patrickmouth Store 32,DC-007,5720,1.6
+ST-033,store,East,Tashatown Store 33,DC-003,5415,2.48
+ST-034,store,West,Lake Nicoleview Store 34,DC-009,7096,1.01
+ST-035,store,Central,Danielchester Store 35,DC-005,7120,2.55
+ST-036,store,North,South Aaron Store 36,DC-001,2976,2.93
+ST-037,store,South,Teresaburgh Store 37,DC-007,7132,1.64
+ST-038,store,East,Port Colleenhaven Store 38,DC-003,7512,2.14
+ST-039,store,West,East Nathaniel Store 39,DC-009,5620,3.46
+ST-040,store,Central,New Stephanie Store 40,DC-005,4169,3.03
+ST-041,store,North,New Mariotown Store 41,DC-001,3910,3.0
+ST-042,store,South,West Natashaport Store 42,DC-002,5604,1.54
+ST-043,store,East,North John Store 43,DC-008,4484,1.79
+ST-044,store,West,North Jessicaland Store 44,DC-009,2468,1.07
+ST-045,store,Central,East Donna Store 45,DC-010,4078,1.05
+ST-046,store,North,West Allison Store 46,DC-006,2992,2.81
+ST-047,store,South,Brandtside Store 47,DC-007,6248,2.85
+ST-048,store,East,Lake Larry Store 48,DC-008,3902,3.23
+ST-049,store,West,Samuelhaven Store 49,DC-004,5562,1.32
+ST-050,store,Central,Martinezbury Store 50,DC-010,2862,2.73

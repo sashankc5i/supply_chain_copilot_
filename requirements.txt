@@ -1,0 +1,22 @@
+# Data generation
+pandas>=2.0
+numpy>=1.24
+Faker>=22.0
+
+# LangGraph copilot core (per design doc tech stack)
+langgraph>=0.2
+langchain>=0.2
+langchain-openai>=0.1
+langchain-anthropic>=0.1
+langsmith>=0.1
+
+# API + dashboard
+fastapi>=0.110
+uvicorn>=0.27
+streamlit>=1.30
+pydantic>=2.0
+python-dotenv>=1.0
+
+# Evaluation / notebooks
+jupyter>=1.0
+matplotlib>=3.7

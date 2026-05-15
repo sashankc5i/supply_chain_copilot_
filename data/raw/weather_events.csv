@@ -1,0 +1,501 @@
+event_id,region,week_start,event_type,event_name,demand_impact_pct,affected_categories,confidence
+EVT-DEMO-001,West,2026-01-12,weather,Regional Heatwave,12.0,Beverage|Frozen,0.82
+EVT-0002,South,2025-06-09,weather,Cold Snap,2.3,PersonalCare,0.49
+EVT-0003,North,2024-12-09,holiday,Thanksgiving,14.3,Frozen|PersonalCare,0.71
+EVT-0004,West,2024-11-18,weather,Snowstorm,-11.9,Snack|PersonalCare,0.51
+EVT-0005,South,2025-03-24,weather,Snowstorm,12.9,HouseholdCare,0.76
+EVT-0006,West,2025-04-28,holiday,New Year,22.8,HouseholdCare|Bakery|Snack|Beverage,0.62
+EVT-0007,North,2026-01-05,weather,Snowstorm,-1.7,PersonalCare,0.64
+EVT-0008,West,2024-08-26,holiday,Memorial Day,22.0,HouseholdCare|Frozen|Dairy|Snack,0.79
+EVT-0009,South,2024-09-23,festival,Sports Final,15.9,Frozen,0.86
+EVT-0010,North,2024-12-16,festival,Food Truck Rally,12.9,PersonalCare|Dairy,0.79
+EVT-0011,Central,2025-04-07,weather,Cold Snap,-10.8,PersonalCare,0.55
+EVT-0012,Central,2026-03-09,holiday,Labor Day,19.8,Dairy|Bakery,0.5
+EVT-0013,East,2025-12-29,weather,Cold Snap,7.7,Beverage|Frozen,0.65
+EVT-0014,South,2024-12-02,weather,Storm,-4.2,Frozen|Dairy|HouseholdCare,0.74
+EVT-0015,East,2025-09-15,weather,Heatwave,-11.5,HouseholdCare|Frozen|PersonalCare,0.52
+EVT-0016,South,2025-07-21,weather,Heatwave,9.0,HouseholdCare|Frozen,0.76
+EVT-0017,South,2025-04-21,holiday,Thanksgiving,32.7,Beverage|HouseholdCare|Bakery|PersonalCare,0.69
+EVT-0018,West,2026-01-12,weather,Snowstorm,2.5,Dairy|Bakery|Snack,0.88
+EVT-0019,East,2025-06-02,weather,Cold Snap,18.3,Bakery|HouseholdCare,0.61
+EVT-0020,West,2024-09-02,festival,Music Fest,14.6,Frozen|PersonalCare,0.8
+EVT-0021,Central,2024-06-24,holiday,Christmas,22.8,Dairy|Frozen,0.68
+EVT-0022,West,2025-10-13,festival,Music Fest,12.8,Beverage|Frozen,0.61
+EVT-0023,North,2025-03-24,weather,Storm,-13.9,Bakery,0.64
+EVT-0024,Central,2024-11-11,weather,Cold Snap,0.3,Dairy|Frozen,0.4
+EVT-0025,East,2024-06-10,festival,Music Fest,14.0,Snack,0.69
+EVT-0026,East,2026-02-02,weather,Storm,7.4,Beverage|Snack,0.62
+EVT-0027,North,2025-08-25,weather,Cold Snap,18.7,Bakery,0.95
+EVT-0028,West,2025-12-15,weather,Heatwave,6.4,Frozen|HouseholdCare,0.89
+EVT-0029,West,2025-12-01,holiday,Independence Day,27.5,Dairy|PersonalCare|HouseholdCare,0.46
+EVT-0030,North,2024-07-08,weather,Snowstorm,-12.2,Dairy|PersonalCare,0.86
+EVT-0031,East,2026-05-11,weather,Cold Snap,-10.9,HouseholdCare,0.5
+EVT-0032,West,2024-10-14,weather,Heatwave,-11.3,Beverage|Frozen|HouseholdCare,0.5
+EVT-0033,West,2025-06-09,weather,Cold Snap,-7.9,Snack|Dairy|Frozen,0.46
+EVT-0034,North,2024-09-30,holiday,Independence Day,11.8,HouseholdCare|Snack|Beverage|Bakery,0.58
+EVT-0035,North,2026-01-05,weather,Storm,15.5,Frozen|PersonalCare|Snack,0.54
+EVT-0036,West,2024-06-10,festival,Food Truck Rally,20.5,Bakery|Beverage,0.61
+EVT-0037,North,2025-04-14,festival,Sports Final,18.1,Bakery|HouseholdCare,0.66
+EVT-0038,East,2025-10-20,weather,Cold Snap,14.9,Dairy,0.51
+EVT-0039,North,2024-12-02,festival,Food Truck Rally,8.0,Snack,0.69
+EVT-0040,West,2024-07-08,festival,Local Carnival,14.3,Frozen,0.55
+EVT-0041,Central,2025-10-27,festival,Local Carnival,10.7,Bakery|HouseholdCare,0.68
+EVT-0042,East,2025-12-29,weather,Cold Snap,11.5,Frozen|Dairy|PersonalCare,0.87
+EVT-0043,Central,2026-02-16,weather,Heatwave,-0.8,Bakery|Dairy|PersonalCare,0.4
+EVT-0044,North,2025-08-11,weather,Heavy Rain,16.4,HouseholdCare,0.9
+EVT-0045,North,2025-07-14,weather,Snowstorm,6.2,Beverage,0.44
+EVT-0046,West,2025-07-21,weather,Cold Snap,-0.9,Snack|HouseholdCare|Dairy,0.78
+EVT-0047,East,2024-11-18,weather,Heavy Rain,19.9,Dairy,0.41
+EVT-0048,South,2025-06-23,weather,Heatwave,17.9,Bakery|Beverage,0.84
+EVT-0049,East,2025-12-08,weather,Snowstorm,-14.9,Frozen|HouseholdCare,0.83
+EVT-0050,West,2025-03-03,festival,Sports Final,16.0,Beverage|Bakery,0.51
+EVT-0051,North,2025-01-06,holiday,Independence Day,28.5,Snack|Bakery|HouseholdCare,0.92
+EVT-0052,Central,2025-04-28,weather,Heatwave,-12.5,HouseholdCare|Beverage|Snack,0.85
+EVT-0053,East,2024-05-27,weather,Heatwave,4.9,Snack,0.8
+EVT-0054,Central,2025-11-24,festival,Food Truck Rally,15.4,Dairy|PersonalCare,0.44
+EVT-0055,North,2025-07-14,holiday,Independence Day,32.3,Bakery|HouseholdCare,0.57
+EVT-0056,West,2025-11-10,weather,Heavy Rain,4.0,HouseholdCare,0.94
+EVT-0057,West,2025-07-28,holiday,Independence Day,21.9,PersonalCare|Beverage|Dairy|Bakery,0.47
+EVT-0058,North,2024-09-16,weather,Snowstorm,-9.1,Dairy|PersonalCare,0.89
+EVT-0059,North,2026-04-13,weather,Cold Snap,-3.8,Snack,0.66
+EVT-0060,East,2026-03-16,festival,Sports Final,8.1,PersonalCare,0.72
+EVT-0061,West,2024-08-12,weather,Heavy Rain,3.2,Bakery,0.6
+EVT-0062,West,2024-09-23,weather,Cold Snap,-9.5,Bakery|PersonalCare|HouseholdCare,0.41
+EVT-0063,West,2025-12-01,weather,Cold Snap,5.8,Frozen|PersonalCare,0.88
+EVT-0064,East,2025-02-10,weather,Heavy Rain,11.0,Snack,0.54
+EVT-0065,North,2026-04-13,holiday,New Year,10.3,Beverage|Bakery,0.57
+EVT-0066,East,2025-08-04,weather,Storm,5.7,Snack,0.5
+EVT-0067,South,2024-08-26,weather,Storm,-14.0,Snack|Bakery|HouseholdCare,0.6
+EVT-0068,North,2025-07-07,holiday,Memorial Day,15.9,HouseholdCare|Dairy|Snack|Bakery,0.88
+EVT-0069,South,2025-06-30,festival,Music Fest,14.2,Frozen|Dairy,0.71
+EVT-0070,North,2026-01-19,weather,Cold Snap,7.9,Dairy|Bakery|Frozen,0.48
+EVT-0071,South,2024-12-30,holiday,Independence Day,30.6,Dairy|HouseholdCare|Snack|Frozen,0.5
+EVT-0072,East,2024-09-16,weather,Storm,19.7,Snack|PersonalCare,0.55
+EVT-0073,Central,2024-07-08,holiday,Independence Day,22.4,Frozen|Dairy,0.53
+EVT-0074,East,2026-04-20,festival,Food Truck Rally,17.7,HouseholdCare,0.53
+EVT-0075,West,2025-08-11,festival,Food Truck Rally,20.5,Beverage,0.56
+EVT-0076,Central,2025-06-02,weather,Snowstorm,19.9,Beverage|HouseholdCare|Frozen,0.66
+EVT-0077,South,2024-10-21,weather,Snowstorm,12.0,Bakery|Beverage,0.74
+EVT-0078,North,2024-08-19,weather,Cold Snap,-0.6,Snack|PersonalCare,0.58
+EVT-0079,West,2025-12-01,holiday,New Year,31.9,PersonalCare|Beverage|Snack|Dairy,0.56
+EVT-0080,Central,2024-11-11,holiday,Memorial Day,20.3,PersonalCare|HouseholdCare,0.8
+EVT-0081,Central,2024-06-17,holiday,Memorial Day,27.0,Frozen|Beverage|Bakery|HouseholdCare,0.76
+EVT-0082,East,2025-05-19,weather,Heatwave,8.3,Dairy,0.48
+EVT-0083,Central,2026-03-16,weather,Heatwave,-14.0,Bakery|PersonalCare,0.6
+EVT-0084,West,2026-04-27,weather,Storm,10.4,Frozen,0.44
+EVT-0085,South,2024-11-04,holiday,Independence Day,26.9,Snack|Beverage|PersonalCare,0.8
+EVT-0086,South,2025-10-13,weather,Heavy Rain,-6.5,Snack|Beverage|HouseholdCare,0.76
+EVT-0087,North,2024-10-21,holiday,Independence Day,23.8,Bakery|Dairy|Snack|Beverage,0.6
+EVT-0088,Central,2024-09-30,festival,Food Truck Rally,6.6,PersonalCare|Frozen,0.77
+EVT-0089,North,2026-04-06,holiday,Labor Day,34.5,Dairy|Beverage|Bakery|PersonalCare,0.75
+EVT-0090,Central,2024-11-04,festival,Local Carnival,19.6,Beverage,0.52
+EVT-0091,South,2026-02-09,festival,Food Truck Rally,8.6,Beverage|Snack,0.74
+EVT-0092,West,2026-05-04,festival,Food Truck Rally,19.0,Bakery|Dairy,0.52
+EVT-0093,Central,2024-07-29,weather,Snowstorm,15.2,Snack|Beverage,0.66
+EVT-0094,East,2024-12-09,weather,Cold Snap,4.2,Frozen,0.68
+EVT-0095,East,2025-09-01,weather,Snowstorm,7.4,Bakery|Beverage|Frozen,0.87
+EVT-0096,East,2024-10-07,weather,Heatwave,-5.4,Snack,0.58
+EVT-0097,East,2025-10-13,weather,Heavy Rain,-13.1,Beverage|Bakery|Snack,0.52
+EVT-0098,North,2024-05-20,weather,Heatwave,-13.6,Dairy|Snack,0.91
+EVT-0099,Central,2025-11-17,weather,Storm,1.2,PersonalCare,0.84
+EVT-0100,West,2024-08-12,weather,Heavy Rain,15.5,HouseholdCare|Dairy,0.72
+EVT-0101,North,2024-12-16,weather,Heavy Rain,17.1,Snack|Dairy,0.72
+EVT-0102,West,2025-12-29,weather,Snowstorm,15.6,Bakery|Snack,0.57
+EVT-0103,North,2026-02-02,weather,Storm,8.1,HouseholdCare|Beverage|PersonalCare,0.44
+EVT-0104,West,2026-04-06,festival,Local Carnival,20.2,Dairy,0.95
+EVT-0105,West,2024-06-03,weather,Storm,0.9,PersonalCare|HouseholdCare,0.66
+EVT-0106,East,2025-10-27,weather,Heavy Rain,-1.0,Dairy|Snack|Bakery,0.69
+EVT-0107,East,2025-04-28,holiday,Labor Day,21.1,Bakery|HouseholdCare|Dairy|Snack,0.45
+EVT-0108,East,2024-09-16,weather,Heatwave,12.8,Snack|Dairy,0.9
+EVT-0109,West,2024-07-01,holiday,Thanksgiving,18.6,Frozen|Dairy|Beverage,0.65
+EVT-0110,West,2024-11-25,weather,Snowstorm,-12.5,Bakery|Dairy,0.54
+EVT-0111,Central,2025-12-01,holiday,Christmas,17.9,Dairy|Bakery|Beverage,0.9
+EVT-0112,West,2025-09-22,holiday,Thanksgiving,13.3,Snack|Bakery,0.52
+EVT-0113,South,2025-02-03,holiday,Thanksgiving,11.8,Frozen|Beverage,0.74
+EVT-0114,Central,2024-08-05,festival,Local Carnival,15.6,Beverage,0.67
+EVT-0115,South,2024-10-21,festival,Sports Final,13.3,Dairy|PersonalCare,0.91
+EVT-0116,Central,2025-05-19,weather,Cold Snap,2.8,Bakery|Dairy|Beverage,0.71
+EVT-0117,West,2025-06-23,weather,Heavy Rain,7.5,Dairy,0.4
+EVT-0118,Central,2024-05-20,weather,Heavy Rain,0.1,Frozen,0.55
+EVT-0119,North,2025-06-23,holiday,Thanksgiving,34.9,Frozen|Snack|PersonalCare|Dairy,0.58
+EVT-0120,South,2024-08-26,holiday,Independence Day,22.3,Frozen|Beverage|Bakery|Snack,0.5
+EVT-0121,South,2025-04-07,weather,Cold Snap,14.5,Frozen|Bakery,0.51
+EVT-0122,South,2025-04-21,weather,Cold Snap,10.5,PersonalCare|Beverage|Dairy,0.72
+EVT-0123,East,2024-10-14,weather,Heavy Rain,2.8,Bakery|PersonalCare,0.41
+EVT-0124,West,2025-05-19,weather,Snowstorm,4.3,PersonalCare|Dairy,0.77
+EVT-0125,South,2026-04-27,holiday,Christmas,20.1,Beverage|Bakery|Dairy|PersonalCare,0.73
+EVT-0126,North,2025-09-22,weather,Heavy Rain,-3.4,Bakery|HouseholdCare|Frozen,0.47
+EVT-0127,North,2024-05-27,weather,Snowstorm,-0.1,Bakery|Snack,0.62
+EVT-0128,East,2024-08-26,weather,Heatwave,-10.2,PersonalCare|Bakery,0.8
+EVT-0129,South,2025-01-06,festival,Music Fest,6.7,HouseholdCare,0.65
+EVT-0130,West,2024-06-03,holiday,New Year,22.6,HouseholdCare|Beverage,0.83
+EVT-0131,South,2026-03-09,holiday,Independence Day,17.3,Snack|PersonalCare|Frozen,0.64
+EVT-0132,East,2025-10-06,weather,Storm,3.2,Snack|Frozen,0.77
+EVT-0133,South,2026-02-23,weather,Storm,-9.8,HouseholdCare|Dairy|Bakery,0.87
+EVT-0134,Central,2024-08-05,festival,Music Fest,12.9,HouseholdCare|Frozen,0.55
+EVT-0135,South,2025-06-02,weather,Storm,9.2,Frozen,0.52
+EVT-0136,West,2026-02-23,weather,Heavy Rain,2.5,HouseholdCare|Snack|Frozen,0.79
+EVT-0137,Central,2025-01-20,holiday,Labor Day,13.0,Frozen|Bakery,0.47
+EVT-0138,North,2025-02-24,weather,Snowstorm,-3.7,Bakery|Beverage|Dairy,0.91
+EVT-0139,West,2026-05-04,weather,Storm,-9.4,HouseholdCare|Snack|Frozen,0.59
+EVT-0140,West,2025-05-05,weather,Storm,-5.0,Dairy|HouseholdCare|Bakery,0.54
+EVT-0141,West,2025-09-01,holiday,Independence Day,19.1,HouseholdCare|Frozen|Bakery|Dairy,0.43
+EVT-0142,West,2026-05-04,holiday,Labor Day,30.0,Beverage|Frozen|HouseholdCare,0.78
+EVT-0143,West,2024-12-09,weather,Heavy Rain,-6.7,Frozen|Bakery|Snack,0.87
+EVT-0144,North,2025-02-03,weather,Heavy Rain,-9.4,Frozen|HouseholdCare|Beverage,0.53
+EVT-0145,South,2024-05-27,weather,Storm,-3.9,Beverage|Bakery,0.74
+EVT-0146,North,2024-12-30,weather,Heavy Rain,5.4,Dairy|Beverage|PersonalCare,0.85
+EVT-0147,South,2024-08-05,festival,Local Carnival,9.5,PersonalCare|Snack,0.57
+EVT-0148,West,2025-08-18,weather,Cold Snap,17.2,Snack,0.4
+EVT-0149,North,2024-11-25,festival,Sports Final,12.1,Dairy|Frozen,0.49
+EVT-0150,Central,2025-01-27,weather,Cold Snap,-7.4,Bakery|Frozen,0.49
+EVT-0151,West,2025-09-01,weather,Cold Snap,12.1,PersonalCare|Frozen|Bakery,0.53
+EVT-0152,North,2024-10-14,weather,Snowstorm,-8.1,Beverage|PersonalCare|Snack,0.73
+EVT-0153,East,2025-07-21,weather,Snowstorm,14.4,PersonalCare|Frozen,0.75
+EVT-0154,West,2025-03-31,holiday,Christmas,24.8,Beverage|Frozen,0.87
+EVT-0155,North,2025-12-08,weather,Cold Snap,6.5,Snack,0.89
+EVT-0156,East,2026-02-16,weather,Snowstorm,-6.6,HouseholdCare|Beverage|Snack,0.54
+EVT-0157,South,2025-07-28,festival,Music Fest,21.6,Beverage|Bakery,0.52
+EVT-0158,East,2025-06-30,weather,Heavy Rain,13.6,Frozen,0.7
+EVT-0159,South,2026-04-27,weather,Heavy Rain,-13.1,PersonalCare|Snack,0.57
+EVT-0160,South,2026-03-16,weather,Storm,6.8,Dairy|Beverage,0.68
+EVT-0161,South,2025-03-10,weather,Storm,0.8,HouseholdCare|Dairy|Frozen,0.67
+EVT-0162,North,2025-01-27,weather,Snowstorm,-8.9,HouseholdCare|Dairy|Frozen,0.91
+EVT-0163,North,2025-05-26,weather,Heavy Rain,-0.4,PersonalCare|Bakery|Dairy,0.82
+EVT-0164,East,2025-02-03,weather,Heatwave,4.4,Beverage|HouseholdCare|Bakery,0.87
+EVT-0165,Central,2026-01-05,holiday,Thanksgiving,10.6,Snack|Dairy|Bakery|Frozen,0.56
+EVT-0166,West,2026-01-19,weather,Storm,6.4,PersonalCare,0.91
+EVT-0167,West,2024-06-03,weather,Snowstorm,6.1,Frozen|Beverage|PersonalCare,0.74
+EVT-0168,North,2025-03-24,weather,Storm,4.3,Frozen|Beverage,0.52
+EVT-0169,East,2025-05-19,festival,Local Carnival,11.0,Bakery|Snack,0.66
+EVT-0170,Central,2025-05-19,festival,Sports Final,5.8,PersonalCare,0.86
+EVT-0171,South,2024-06-17,holiday,New Year,18.0,PersonalCare|Snack|Frozen|Dairy,0.67
+EVT-0172,West,2024-12-02,festival,Music Fest,6.8,PersonalCare|Frozen,0.43
+EVT-0173,South,2025-03-17,weather,Storm,5.6,Frozen,0.57
+EVT-0174,East,2026-03-30,festival,Sports Final,13.3,Bakery,0.8
+EVT-0175,West,2024-12-16,weather,Heavy Rain,-10.7,Snack|Frozen|PersonalCare,0.86
+EVT-0176,West,2024-09-23,weather,Snowstorm,-8.3,Bakery,0.68
+EVT-0177,North,2025-04-07,weather,Heavy Rain,-1.5,Beverage|Snack,0.43
+EVT-0178,South,2024-06-03,festival,Sports Final,22.9,Snack|Bakery,0.77
+EVT-0179,West,2024-09-16,weather,Heavy Rain,15.8,HouseholdCare,0.64
+EVT-0180,West,2025-11-17,weather,Storm,-6.0,Bakery|Snack,0.65
+EVT-0181,North,2025-08-25,weather,Heatwave,-13.2,Snack|PersonalCare,0.44
+EVT-0182,Central,2024-11-11,weather,Heatwave,16.9,Bakery|Snack|Dairy,0.42
+EVT-0183,South,2024-07-08,weather,Heatwave,-11.4,HouseholdCare|Frozen,0.46
+EVT-0184,West,2025-03-31,weather,Snowstorm,-14.8,Dairy,0.53
+EVT-0185,North,2024-05-27,festival,Local Carnival,13.1,Dairy,0.79
+EVT-0186,West,2024-09-30,holiday,Christmas,20.9,HouseholdCare|Frozen,0.56
+EVT-0187,North,2026-03-02,weather,Storm,1.1,HouseholdCare|Frozen|Beverage,0.46
+EVT-0188,North,2025-04-28,festival,Sports Final,10.2,Beverage,0.81
+EVT-0189,Central,2026-05-11,festival,Sports Final,13.5,Frozen|Dairy,0.76
+EVT-0190,East,2024-09-09,holiday,Labor Day,19.2,Beverage|Snack|Bakery|Dairy,0.67
+EVT-0191,Central,2025-09-08,festival,Local Carnival,21.5,Dairy|PersonalCare,0.82
+EVT-0192,Central,2025-10-20,holiday,Memorial Day,28.3,HouseholdCare|Bakery,0.94
+EVT-0193,South,2026-04-06,weather,Heatwave,-11.1,PersonalCare,0.71
+EVT-0194,East,2025-08-04,weather,Heavy Rain,0.7,Frozen,0.77
+EVT-0195,Central,2026-05-04,holiday,New Year,34.8,PersonalCare|Snack|HouseholdCare,0.7
+EVT-0196,West,2025-10-27,holiday,New Year,10.3,Snack|Frozen|Beverage,0.5
+EVT-0197,South,2025-02-17,weather,Cold Snap,-6.2,PersonalCare|Snack|Bakery,0.62
+EVT-0198,North,2026-03-16,weather,Heatwave,-3.5,Dairy|Beverage,0.88
+EVT-0199,West,2025-01-27,weather,Heatwave,-9.9,Snack|Frozen|HouseholdCare,0.59
+EVT-0200,South,2025-11-10,holiday,Thanksgiving,14.0,HouseholdCare|Dairy,0.78
+EVT-0201,West,2024-12-02,holiday,Memorial Day,16.9,Snack|Frozen|Beverage|Bakery,0.56
+EVT-0202,West,2025-10-27,weather,Heavy Rain,8.3,Snack|Frozen|HouseholdCare,0.76
+EVT-0203,West,2025-12-08,holiday,Labor Day,33.2,HouseholdCare|Dairy|Snack,0.85
+EVT-0204,North,2024-07-15,holiday,Labor Day,32.5,HouseholdCare|Dairy,0.64
+EVT-0205,Central,2024-06-17,holiday,Memorial Day,17.9,Dairy|Beverage|HouseholdCare,0.73
+EVT-0206,East,2025-09-22,holiday,Thanksgiving,28.0,Beverage|Snack,0.52
+EVT-0207,Central,2026-03-02,holiday,Memorial Day,14.7,Snack|Beverage,0.45
+EVT-0208,East,2025-04-14,weather,Storm,4.7,PersonalCare|Dairy|HouseholdCare,0.64
+EVT-0209,East,2024-12-30,weather,Storm,-3.6,Beverage|Bakery,0.77
+EVT-0210,West,2025-02-17,weather,Heavy Rain,4.3,Dairy,0.6
+EVT-0211,West,2025-11-17,weather,Storm,13.6,Beverage|Snack|PersonalCare,0.5
+EVT-0212,South,2025-04-21,holiday,Christmas,34.0,Snack|Dairy,0.61
+EVT-0213,South,2025-11-24,weather,Heavy Rain,-14.8,Bakery|Beverage|HouseholdCare,0.85
+EVT-0214,North,2025-07-28,festival,Music Fest,13.9,PersonalCare,0.63
+EVT-0215,West,2024-11-25,holiday,Independence Day,30.7,Beverage|Snack|HouseholdCare,0.47
+EVT-0216,North,2026-01-05,festival,Music Fest,24.2,Snack|Dairy,0.59
+EVT-0217,Central,2025-09-15,weather,Cold Snap,-14.8,Bakery,0.81
+EVT-0218,Central,2026-03-23,weather,Heavy Rain,-8.8,Bakery|Beverage,0.43
+EVT-0219,North,2025-08-18,holiday,Independence Day,12.7,Beverage|Snack|Dairy|HouseholdCare,0.48
+EVT-0220,West,2024-07-29,weather,Storm,-12.8,Frozen|HouseholdCare,0.78
+EVT-0221,South,2026-03-16,weather,Storm,0.8,Frozen|Bakery,0.41
+EVT-0222,South,2025-01-27,weather,Snowstorm,15.9,Snack|HouseholdCare,0.48
+EVT-0223,Central,2025-08-18,weather,Heavy Rain,-4.1,PersonalCare|Frozen|Snack,0.87
+EVT-0224,Central,2026-04-20,weather,Storm,-14.2,Frozen,0.49
+EVT-0225,South,2025-08-04,weather,Heatwave,6.9,Frozen|PersonalCare,0.49
+EVT-0226,Central,2025-12-08,weather,Heatwave,-11.5,HouseholdCare|Frozen,0.58
+EVT-0227,East,2024-10-14,weather,Snowstorm,-8.8,Frozen|Snack,0.71
+EVT-0228,South,2024-11-11,weather,Storm,8.6,Beverage|Snack,0.57
+EVT-0229,Central,2024-08-19,weather,Snowstorm,13.4,Snack|Dairy|PersonalCare,0.59
+EVT-0230,South,2025-11-17,festival,Food Truck Rally,17.1,Frozen,0.4
+EVT-0231,South,2025-09-15,festival,Sports Final,17.0,Bakery,0.7
+EVT-0232,North,2026-04-27,weather,Heavy Rain,8.5,Beverage|Frozen,0.44
+EVT-0233,South,2025-08-11,weather,Heatwave,8.2,HouseholdCare,0.57
+EVT-0234,South,2025-09-15,weather,Storm,17.5,Snack,0.46
+EVT-0235,South,2026-03-23,weather,Snowstorm,-6.4,HouseholdCare|Frozen,0.51
+EVT-0236,North,2024-09-02,festival,Local Carnival,15.0,Dairy,0.58
+EVT-0237,Central,2024-08-05,weather,Snowstorm,8.7,PersonalCare,0.81
+EVT-0238,East,2025-02-17,holiday,New Year,27.9,PersonalCare|Bakery,0.71
+EVT-0239,Central,2025-07-07,weather,Cold Snap,6.5,Dairy|Bakery,0.72
+EVT-0240,Central,2025-07-07,weather,Storm,17.0,Dairy|Beverage,0.66
+EVT-0241,East,2025-03-10,weather,Heatwave,16.4,PersonalCare|Frozen,0.71
+EVT-0242,East,2025-07-28,weather,Cold Snap,9.8,Beverage|Frozen,0.56
+EVT-0243,West,2025-03-31,holiday,New Year,15.7,Dairy|Beverage,0.73
+EVT-0244,West,2025-04-07,weather,Storm,7.5,Snack,0.41
+EVT-0245,West,2025-01-20,holiday,Memorial Day,29.2,Bakery|Beverage,0.63
+EVT-0246,Central,2025-03-17,weather,Heatwave,-11.0,Dairy,0.54
+EVT-0247,West,2025-05-05,holiday,Independence Day,24.1,Dairy|Beverage,0.83
+EVT-0248,South,2025-08-11,weather,Snowstorm,5.3,PersonalCare,0.64
+EVT-0249,North,2026-05-04,weather,Snowstorm,0.6,HouseholdCare|Dairy|Snack,0.51
+EVT-0250,West,2025-12-22,festival,Music Fest,19.9,PersonalCare,0.41
+EVT-0251,East,2024-08-19,weather,Heatwave,-7.7,Frozen|Snack|PersonalCare,0.76
+EVT-0252,Central,2025-08-04,festival,Sports Final,12.2,HouseholdCare|Frozen,0.9
+EVT-0253,East,2026-05-04,weather,Cold Snap,11.4,Dairy|PersonalCare,0.61
+EVT-0254,West,2025-07-14,weather,Snowstorm,-14.5,Bakery|Beverage,0.82
+EVT-0255,North,2024-11-18,festival,Sports Final,7.1,Frozen,0.87
+EVT-0256,North,2024-12-16,holiday,Thanksgiving,32.5,Bakery|PersonalCare,0.85
+EVT-0257,North,2026-01-12,weather,Heatwave,11.6,Beverage|Frozen,0.9
+EVT-0258,West,2024-06-24,festival,Sports Final,20.4,Frozen|PersonalCare,0.78
+EVT-0259,Central,2025-03-03,weather,Heatwave,13.9,HouseholdCare,0.45
+EVT-0260,West,2025-11-24,weather,Storm,-12.6,Bakery,0.84
+EVT-0261,Central,2025-12-01,festival,Sports Final,11.5,HouseholdCare,0.56
+EVT-0262,East,2026-02-23,weather,Heatwave,16.3,Frozen|Beverage|HouseholdCare,0.77
+EVT-0263,West,2024-09-16,festival,Food Truck Rally,19.4,Bakery,0.83
+EVT-0264,South,2025-09-22,festival,Sports Final,8.7,HouseholdCare,0.93
+EVT-0265,Central,2024-11-04,festival,Music Fest,12.6,PersonalCare,0.81
+EVT-0266,South,2025-08-04,weather,Storm,2.3,Frozen,0.43
+EVT-0267,South,2024-11-11,weather,Snowstorm,11.1,HouseholdCare|PersonalCare,0.63
+EVT-0268,Central,2025-08-11,weather,Heavy Rain,11.1,PersonalCare|Bakery,0.53
+EVT-0269,Central,2025-01-06,weather,Storm,-13.7,Frozen|HouseholdCare|Bakery,0.45
+EVT-0270,Central,2026-05-11,festival,Music Fest,22.3,Frozen,0.81
+EVT-0271,South,2026-04-27,festival,Local Carnival,21.2,Dairy|PersonalCare,0.78
+EVT-0272,North,2024-08-05,weather,Snowstorm,6.9,Frozen|PersonalCare|Bakery,0.62
+EVT-0273,West,2025-12-22,weather,Heavy Rain,11.6,Dairy|HouseholdCare|Frozen,0.79
+EVT-0274,South,2024-07-01,festival,Food Truck Rally,15.3,Bakery|Beverage,0.79
+EVT-0275,West,2025-07-28,weather,Heavy Rain,-4.5,Dairy|Snack,0.63
+EVT-0276,South,2026-01-19,holiday,Christmas,14.3,Snack|HouseholdCare|Dairy|Bakery,0.69
+EVT-0277,South,2025-02-24,holiday,Memorial Day,17.5,Bakery|HouseholdCare|Snack|Frozen,0.88
+EVT-0278,Central,2025-04-28,weather,Heatwave,-1.8,HouseholdCare,0.55
+EVT-0279,South,2024-09-02,holiday,Christmas,32.2,HouseholdCare|Bakery|Snack|Frozen,0.95
+EVT-0280,North,2024-06-03,festival,Local Carnival,5.9,Bakery,0.72
+EVT-0281,Central,2025-04-07,weather,Cold Snap,-6.2,HouseholdCare|Frozen,0.76
+EVT-0282,Central,2025-09-15,holiday,New Year,30.7,PersonalCare|Dairy,0.51
+EVT-0283,North,2025-06-30,holiday,Thanksgiving,13.0,PersonalCare|Snack|Beverage,0.73
+EVT-0284,North,2025-10-20,weather,Snowstorm,-4.1,Snack,0.83
+EVT-0285,South,2025-02-03,festival,Food Truck Rally,5.8,Snack,0.49
+EVT-0286,Central,2024-07-15,festival,Music Fest,16.8,Snack|Frozen,0.42
+EVT-0287,Central,2024-12-16,holiday,Independence Day,31.0,Beverage|PersonalCare|Dairy,0.42
+EVT-0288,West,2025-12-15,weather,Snowstorm,15.8,Bakery|Frozen,0.56
+EVT-0289,West,2025-10-20,weather,Snowstorm,-11.3,HouseholdCare|Frozen,0.55
+EVT-0290,West,2025-12-15,holiday,Labor Day,31.7,Snack|HouseholdCare|Beverage|Frozen,0.57
+EVT-0291,West,2025-04-28,holiday,Thanksgiving,30.5,PersonalCare|Bakery|Snack|Frozen,0.54
+EVT-0292,East,2024-11-11,weather,Heatwave,4.3,Beverage,0.62
+EVT-0293,South,2026-04-20,holiday,Labor Day,27.3,Dairy|Snack|Bakery,0.42
+EVT-0294,North,2024-06-24,weather,Cold Snap,-2.1,HouseholdCare|Frozen|PersonalCare,0.65
+EVT-0295,East,2025-06-02,weather,Cold Snap,7.4,Dairy|HouseholdCare|Beverage,0.57
+EVT-0296,North,2024-09-09,weather,Snowstorm,-4.1,Bakery|PersonalCare,0.83
+EVT-0297,South,2025-01-27,weather,Heavy Rain,13.0,Dairy,0.43
+EVT-0298,East,2026-05-11,weather,Heatwave,-7.3,Frozen|Dairy|Bakery,0.77
+EVT-0299,North,2024-08-26,weather,Cold Snap,14.0,Dairy|Bakery,0.6
+EVT-0300,East,2025-02-17,weather,Cold Snap,1.9,Frozen|Beverage|HouseholdCare,0.9
+EVT-0301,Central,2024-07-22,holiday,Christmas,24.5,PersonalCare|Frozen|Beverage|Dairy,0.47
+EVT-0302,East,2024-09-09,holiday,New Year,22.5,Frozen|Bakery,0.83
+EVT-0303,Central,2025-02-24,festival,Local Carnival,19.1,Beverage|Snack,0.47
+EVT-0304,Central,2024-09-09,weather,Cold Snap,11.0,Frozen|PersonalCare|HouseholdCare,0.47
+EVT-0305,Central,2024-08-19,festival,Local Carnival,22.4,PersonalCare|Beverage,0.91
+EVT-0306,East,2025-02-10,weather,Heatwave,-10.6,Snack|Beverage,0.88
+EVT-0307,Central,2024-09-23,festival,Food Truck Rally,9.4,HouseholdCare|Dairy,0.4
+EVT-0308,Central,2026-05-11,holiday,Memorial Day,19.7,Dairy|HouseholdCare|Bakery,0.68
+EVT-0309,South,2024-09-02,weather,Cold Snap,14.7,Beverage|Snack|PersonalCare,0.47
+EVT-0310,South,2025-12-29,holiday,Independence Day,25.9,Frozen|Snack|Dairy|HouseholdCare,0.88
+EVT-0311,South,2025-12-15,weather,Storm,-4.9,Beverage|Dairy,0.43
+EVT-0312,North,2024-09-30,weather,Heatwave,3.3,Frozen|Bakery|PersonalCare,0.87
+EVT-0313,North,2024-09-23,weather,Heatwave,5.0,HouseholdCare|Beverage,0.84
+EVT-0314,North,2024-11-11,weather,Snowstorm,10.5,Beverage|Bakery,0.74
+EVT-0315,North,2024-09-23,holiday,Labor Day,19.4,Frozen|PersonalCare|Beverage,0.48
+EVT-0316,West,2024-10-07,holiday,New Year,30.9,Bakery|HouseholdCare|PersonalCare|Dairy,0.6
+EVT-0317,North,2025-08-11,holiday,Independence Day,19.6,HouseholdCare|Snack|PersonalCare,0.82
+EVT-0318,West,2024-08-19,weather,Cold Snap,-15.0,Frozen|Snack|Beverage,0.59
+EVT-0319,West,2024-11-11,weather,Storm,-6.4,PersonalCare|Frozen|Beverage,0.56
+EVT-0320,South,2025-10-27,holiday,Thanksgiving,18.2,Snack|PersonalCare,0.5
+EVT-0321,Central,2024-09-09,weather,Cold Snap,-8.4,Beverage|HouseholdCare|Bakery,0.74
+EVT-0322,South,2025-12-01,holiday,Memorial Day,33.0,Bakery|PersonalCare,0.8
+EVT-0323,Central,2026-03-30,weather,Storm,-0.2,Beverage,0.65
+EVT-0324,South,2024-05-20,weather,Storm,9.1,HouseholdCare|Beverage|Frozen,0.89
+EVT-0325,East,2025-08-25,holiday,New Year,21.5,Bakery|Snack|Beverage|HouseholdCare,0.62
+EVT-0326,West,2025-03-24,weather,Storm,9.7,Dairy|HouseholdCare|PersonalCare,0.42
+EVT-0327,East,2025-02-24,weather,Snowstorm,8.1,HouseholdCare|PersonalCare|Beverage,0.54
+EVT-0328,West,2025-08-04,holiday,Independence Day,13.4,Beverage|PersonalCare|Frozen|HouseholdCare,0.83
+EVT-0329,East,2026-04-27,weather,Cold Snap,19.6,Frozen,0.67
+EVT-0330,East,2024-09-30,holiday,Thanksgiving,26.9,HouseholdCare|Dairy,0.42
+EVT-0331,South,2025-06-02,festival,Music Fest,20.0,Dairy,0.73
+EVT-0332,South,2024-09-09,weather,Heavy Rain,9.3,Dairy|Snack,0.64
+EVT-0333,East,2024-12-02,weather,Cold Snap,-9.9,Bakery|Frozen,0.67
+EVT-0334,South,2025-04-14,weather,Cold Snap,16.8,PersonalCare|Frozen,0.52
+EVT-0335,Central,2024-07-29,weather,Heatwave,-0.3,Frozen|PersonalCare|Beverage,0.75
+EVT-0336,East,2024-06-10,weather,Heatwave,-9.2,Dairy|Beverage|Snack,0.74
+EVT-0337,Central,2024-09-23,weather,Snowstorm,-7.8,HouseholdCare|Dairy,0.9
+EVT-0338,Central,2025-09-01,festival,Local Carnival,14.6,Bakery,0.89
+EVT-0339,South,2025-09-08,weather,Heatwave,9.7,PersonalCare|HouseholdCare|Dairy,0.84
+EVT-0340,North,2024-06-03,weather,Snowstorm,-7.3,Frozen|Bakery,0.42
+EVT-0341,North,2025-09-08,holiday,Thanksgiving,26.4,Dairy|Bakery,0.82
+EVT-0342,West,2025-02-24,weather,Cold Snap,14.4,Snack,0.68
+EVT-0343,East,2024-11-25,festival,Food Truck Rally,22.8,Bakery|HouseholdCare,0.9
+EVT-0344,West,2024-08-19,festival,Music Fest,21.1,PersonalCare|Bakery,0.93
+EVT-0345,South,2026-03-30,weather,Cold Snap,3.3,Beverage|Dairy,0.45
+EVT-0346,East,2026-01-26,holiday,Independence Day,27.7,Beverage|Bakery|Dairy,0.48
+EVT-0347,Central,2024-05-27,holiday,New Year,23.3,Frozen|HouseholdCare|PersonalCare,0.53
+EVT-0348,West,2026-02-02,weather,Storm,5.9,Dairy,0.87
+EVT-0349,North,2024-11-25,holiday,Christmas,16.2,HouseholdCare|Beverage|Dairy,0.66
+EVT-0350,Central,2025-02-17,holiday,Thanksgiving,18.4,Dairy|Beverage|Bakery,0.9
+EVT-0351,Central,2025-01-13,festival,Food Truck Rally,10.7,Frozen|HouseholdCare,0.8
+EVT-0352,West,2025-09-29,weather,Snowstorm,17.2,Beverage|Dairy|Bakery,0.67
+EVT-0353,South,2025-03-17,weather,Snowstorm,2.8,HouseholdCare|Frozen|Dairy,0.69
+EVT-0354,Central,2026-02-09,weather,Snowstorm,0.1,HouseholdCare|Snack,0.79
+EVT-0355,East,2024-12-02,festival,Music Fest,24.5,Bakery,0.56
+EVT-0356,South,2024-12-16,weather,Heavy Rain,-4.8,Dairy|Bakery|Frozen,0.76
+EVT-0357,Central,2025-08-04,holiday,Thanksgiving,31.9,Snack|Beverage|HouseholdCare,0.51
+EVT-0358,East,2025-08-18,weather,Snowstorm,-10.3,Dairy,0.82
+EVT-0359,West,2025-04-21,holiday,Independence Day,23.9,PersonalCare|Snack|Bakery,0.4
+EVT-0360,North,2024-10-07,weather,Heatwave,18.7,Frozen|Beverage|Snack,0.41
+EVT-0361,South,2025-06-02,holiday,Christmas,33.7,PersonalCare|Snack|Dairy,0.51
+EVT-0362,West,2025-09-29,festival,Music Fest,15.6,Bakery,0.83
+EVT-0363,West,2026-03-09,weather,Heatwave,-11.0,Dairy,0.66
+EVT-0364,Central,2025-03-10,weather,Cold Snap,-11.2,Frozen|HouseholdCare,0.61
+EVT-0365,East,2026-02-09,weather,Storm,14.9,Bakery,0.67
+EVT-0366,West,2026-01-19,festival,Local Carnival,9.5,Snack|Beverage,0.66
+EVT-0367,West,2025-02-03,holiday,Memorial Day,17.4,HouseholdCare|Snack,0.55
+EVT-0368,Central,2025-11-10,holiday,Memorial Day,28.1,Bakery|Frozen|Beverage,0.81
+EVT-0369,South,2025-10-13,holiday,Thanksgiving,23.9,Bakery|Dairy|Snack,0.92
+EVT-0370,West,2025-03-03,festival,Music Fest,24.8,Bakery|Frozen,0.42
+EVT-0371,North,2024-11-25,holiday,Christmas,16.2,Bakery|PersonalCare|Snack,0.88
+EVT-0372,North,2026-04-27,holiday,Memorial Day,16.4,HouseholdCare|Beverage|Dairy|Frozen,0.77
+EVT-0373,South,2025-07-14,festival,Music Fest,22.0,Beverage,0.64
+EVT-0374,North,2025-02-10,weather,Storm,17.0,Dairy|Beverage,0.88
+EVT-0375,East,2024-10-07,holiday,Independence Day,33.6,Beverage|Bakery,0.72
+EVT-0376,North,2024-09-02,holiday,Memorial Day,28.8,HouseholdCare|Snack,0.8
+EVT-0377,East,2025-11-17,holiday,Thanksgiving,17.6,Snack|PersonalCare,0.42
+EVT-0378,North,2025-01-20,weather,Heatwave,-4.4,HouseholdCare|Snack|Beverage,0.55
+EVT-0379,North,2024-12-23,festival,Sports Final,6.0,Frozen|Dairy,0.47
+EVT-0380,North,2025-05-19,holiday,Labor Day,32.3,Beverage|HouseholdCare|Snack|PersonalCare,0.87
+EVT-0381,South,2024-06-24,weather,Cold Snap,10.3,HouseholdCare|Snack|PersonalCare,0.86
+EVT-0382,Central,2024-09-09,weather,Heatwave,14.9,Bakery|Snack,0.53
+EVT-0383,Central,2025-04-28,weather,Storm,-10.9,Bakery|PersonalCare,0.78
+EVT-0384,West,2025-05-19,holiday,New Year,32.5,Snack|Beverage|Bakery,0.73
+EVT-0385,West,2024-10-28,weather,Heavy Rain,0.5,HouseholdCare|Dairy|Frozen,0.85
+EVT-0386,West,2025-11-10,holiday,Thanksgiving,22.0,Bakery|Snack,0.93
+EVT-0387,North,2025-01-13,festival,Sports Final,10.1,Dairy|Bakery,0.84
+EVT-0388,West,2025-01-27,festival,Local Carnival,10.3,Dairy,0.62
+EVT-0389,North,2026-01-26,weather,Heatwave,-5.5,Beverage|PersonalCare,0.46
+EVT-0390,North,2024-10-21,festival,Sports Final,5.2,Frozen,0.54
+EVT-0391,West,2024-09-16,weather,Heatwave,19.5,Dairy|Snack|Beverage,0.53
+EVT-0392,East,2025-12-29,weather,Storm,-14.9,Beverage,0.41
+EVT-0393,East,2026-05-04,festival,Sports Final,16.7,Snack,0.78
+EVT-0394,West,2024-07-01,holiday,New Year,24.5,Dairy|Snack|Beverage|Frozen,0.84
+EVT-0395,West,2025-09-01,weather,Heatwave,13.6,PersonalCare|Snack,0.75
+EVT-0396,North,2024-07-08,weather,Storm,17.1,Snack,0.76
+EVT-0397,South,2025-08-18,festival,Sports Final,15.5,Frozen,0.61
+EVT-0398,West,2026-04-13,holiday,New Year,20.6,PersonalCare|HouseholdCare|Snack|Bakery,0.54
+EVT-0399,Central,2025-12-15,holiday,Memorial Day,21.9,Snack|HouseholdCare,0.6
+EVT-0400,West,2025-05-26,weather,Cold Snap,8.9,HouseholdCare|Beverage,0.89
+EVT-0401,East,2024-07-29,weather,Cold Snap,8.1,HouseholdCare,0.73
+EVT-0402,East,2024-10-28,festival,Food Truck Rally,23.8,PersonalCare,0.71
+EVT-0403,Central,2025-07-21,weather,Cold Snap,-12.9,HouseholdCare,0.85
+EVT-0404,North,2024-12-09,weather,Heavy Rain,-10.7,Dairy|PersonalCare,0.53
+EVT-0405,East,2025-04-28,holiday,Labor Day,13.1,Frozen|Dairy|PersonalCare,0.69
+EVT-0406,East,2024-09-09,holiday,Independence Day,31.4,Dairy|PersonalCare,0.74
+EVT-0407,West,2025-08-18,festival,Sports Final,21.8,Dairy|Frozen,0.62
+EVT-0408,South,2025-03-17,weather,Heatwave,-0.2,Beverage,0.42
+EVT-0409,South,2024-08-26,weather,Heavy Rain,5.2,Bakery|Frozen,0.87
+EVT-0410,East,2024-07-29,holiday,New Year,10.4,PersonalCare|Snack|Frozen|Dairy,0.6
+EVT-0411,East,2025-11-24,weather,Heatwave,-11.7,Beverage|Dairy,0.69
+EVT-0412,North,2025-09-29,weather,Heatwave,-5.5,Beverage,0.9
+EVT-0413,West,2026-01-19,weather,Heatwave,13.0,HouseholdCare,0.63
+EVT-0414,Central,2024-06-17,weather,Storm,16.8,PersonalCare|Bakery,0.75
+EVT-0415,South,2025-02-03,festival,Food Truck Rally,21.4,Dairy,0.59
+EVT-0416,Central,2025-04-21,holiday,Labor Day,22.9,Bakery|HouseholdCare|Snack|Dairy,0.8
+EVT-0417,South,2024-07-08,weather,Storm,6.6,Beverage,0.76
+EVT-0418,North,2025-04-14,weather,Heavy Rain,11.5,Snack|Dairy|PersonalCare,0.79
+EVT-0419,South,2024-08-26,holiday,New Year,23.9,Snack|PersonalCare|Frozen,0.49
+EVT-0420,South,2025-09-15,weather,Storm,-1.7,HouseholdCare|Beverage,0.69
+EVT-0421,West,2025-09-22,festival,Food Truck Rally,20.8,Bakery|Snack,0.59
+EVT-0422,West,2025-05-19,weather,Storm,7.2,Bakery,0.47
+EVT-0423,North,2025-02-10,festival,Sports Final,23.7,Frozen,0.42
+EVT-0424,South,2025-06-30,holiday,Memorial Day,31.5,HouseholdCare|Bakery,0.67
+EVT-0425,West,2024-08-12,holiday,Thanksgiving,34.3,HouseholdCare|Dairy,0.43
+EVT-0426,South,2026-05-04,holiday,Labor Day,27.6,Beverage|PersonalCare|Bakery|Dairy,0.44
+EVT-0427,West,2024-07-15,weather,Cold Snap,-7.9,PersonalCare|Dairy,0.6
+EVT-0428,East,2025-03-10,holiday,Thanksgiving,18.4,Snack|Bakery,0.52
+EVT-0429,South,2025-01-13,weather,Storm,16.7,HouseholdCare|Beverage,0.69
+EVT-0430,South,2025-05-26,weather,Heavy Rain,7.7,Bakery,0.77
+EVT-0431,East,2025-01-06,holiday,Christmas,18.8,Snack|Dairy,0.41
+EVT-0432,West,2025-09-22,weather,Snowstorm,-12.8,HouseholdCare,0.62
+EVT-0433,West,2025-10-27,festival,Local Carnival,24.1,Bakery|Dairy,0.73
+EVT-0434,South,2025-08-11,holiday,Christmas,11.6,Snack|Bakery,0.47
+EVT-0435,North,2025-07-14,festival,Music Fest,17.0,Dairy|PersonalCare,0.69
+EVT-0436,Central,2024-12-30,holiday,Independence Day,30.4,Snack|Bakery|PersonalCare,0.6
+EVT-0437,Central,2024-11-04,holiday,New Year,26.7,Frozen|Beverage|PersonalCare,0.59
+EVT-0438,North,2024-12-09,holiday,Memorial Day,28.8,HouseholdCare|Beverage|Bakery,0.58
+EVT-0439,East,2025-01-20,weather,Storm,16.9,Dairy,0.94
+EVT-0440,East,2025-10-27,weather,Snowstorm,9.4,HouseholdCare|Bakery,0.9
+EVT-0441,West,2025-09-01,holiday,Independence Day,16.8,HouseholdCare|Bakery,0.7
+EVT-0442,Central,2025-02-17,holiday,Memorial Day,28.1,Frozen|Bakery|PersonalCare|HouseholdCare,0.93
+EVT-0443,East,2026-02-16,weather,Heavy Rain,10.1,Frozen,0.56
+EVT-0444,North,2025-02-03,holiday,Thanksgiving,18.9,Snack|Bakery|HouseholdCare|Beverage,0.71
+EVT-0445,North,2026-01-26,weather,Heatwave,5.9,Bakery|Dairy|PersonalCare,0.54
+EVT-0446,South,2025-06-30,festival,Local Carnival,21.4,HouseholdCare,0.83
+EVT-0447,North,2025-08-18,holiday,Labor Day,34.1,Dairy|Snack|PersonalCare,0.75
+EVT-0448,Central,2024-06-24,holiday,Independence Day,11.4,Beverage|PersonalCare,0.9
+EVT-0449,South,2025-12-01,weather,Heavy Rain,14.3,Frozen|PersonalCare|Dairy,0.81
+EVT-0450,North,2026-03-02,holiday,New Year,23.2,Beverage|HouseholdCare|PersonalCare,0.43
+EVT-0451,Central,2025-07-07,weather,Cold Snap,-12.4,Bakery|Beverage|Frozen,0.53
+EVT-0452,East,2025-02-17,festival,Sports Final,5.5,Beverage,0.94
+EVT-0453,East,2025-12-22,festival,Food Truck Rally,14.7,Beverage|Snack,0.73
+EVT-0454,West,2025-08-04,weather,Snowstorm,-15.0,Snack|HouseholdCare|Frozen,0.49
+EVT-0455,North,2024-09-23,holiday,Independence Day,28.5,PersonalCare|Snack,0.76
+EVT-0456,East,2024-07-15,weather,Cold Snap,18.7,HouseholdCare,0.61
+EVT-0457,Central,2025-03-17,weather,Cold Snap,-4.8,HouseholdCare|Bakery|Snack,0.64
+EVT-0458,North,2025-02-17,weather,Storm,-10.1,Dairy|Bakery|Frozen,0.41
+EVT-0459,North,2024-08-26,weather,Heatwave,-1.8,PersonalCare,0.8
+EVT-0460,South,2025-03-24,festival,Music Fest,18.3,Bakery|Snack,0.69
+EVT-0461,South,2025-03-03,holiday,Christmas,15.7,Beverage|Dairy|Bakery,0.84
+EVT-0462,South,2025-12-15,festival,Local Carnival,17.7,PersonalCare,0.81
+EVT-0463,West,2024-08-12,weather,Heatwave,-3.5,Dairy|Bakery,0.86
+EVT-0464,Central,2025-09-22,holiday,Independence Day,22.0,Dairy|Snack,0.41
+EVT-0465,South,2025-12-29,weather,Storm,5.0,Snack|Beverage|Bakery,0.75
+EVT-0466,North,2025-01-20,holiday,Christmas,33.9,Frozen|Bakery,0.69
+EVT-0467,West,2025-07-21,festival,Local Carnival,12.7,Bakery,0.53
+EVT-0468,West,2025-03-03,holiday,New Year,33.9,HouseholdCare|Frozen,0.95
+EVT-0469,South,2025-12-22,weather,Cold Snap,14.8,HouseholdCare|Snack,0.77
+EVT-0470,Central,2025-03-17,weather,Heatwave,8.7,Frozen,0.53
+EVT-0471,North,2025-12-22,holiday,Independence Day,20.6,PersonalCare|Frozen|Snack,0.87
+EVT-0472,North,2025-01-20,holiday,Christmas,28.2,Frozen|HouseholdCare|PersonalCare|Snack,0.72
+EVT-0473,Central,2024-08-26,festival,Sports Final,22.1,Frozen|PersonalCare,0.49
+EVT-0474,South,2025-04-07,holiday,Thanksgiving,30.0,HouseholdCare|Beverage|PersonalCare,0.51
+EVT-0475,West,2025-04-21,weather,Heatwave,2.6,Frozen,0.8
+EVT-0476,Central,2025-02-03,holiday,Independence Day,12.9,PersonalCare|HouseholdCare,0.58
+EVT-0477,Central,2026-01-19,weather,Cold Snap,9.1,Snack|Dairy,0.62
+EVT-0478,West,2025-01-06,weather,Storm,8.1,Dairy,0.55
+EVT-0479,East,2024-07-01,holiday,Christmas,29.9,Bakery|PersonalCare,0.89
+EVT-0480,West,2025-10-06,holiday,Independence Day,18.6,Bakery|Beverage|Frozen,0.62
+EVT-0481,West,2024-06-17,weather,Heatwave,-8.9,Frozen|Bakery,0.83
+EVT-0482,Central,2025-07-28,holiday,New Year,11.7,Bakery|PersonalCare|Frozen|HouseholdCare,0.52
+EVT-0483,North,2024-09-09,weather,Cold Snap,-10.3,Bakery|Frozen,0.41
+EVT-0484,Central,2024-09-30,weather,Heavy Rain,-4.4,PersonalCare|Snack|Beverage,0.73
+EVT-0485,South,2026-04-13,holiday,Christmas,25.6,Bakery|HouseholdCare|Snack|PersonalCare,0.79
+EVT-0486,North,2025-04-21,festival,Sports Final,22.6,Beverage|Snack,0.73
+EVT-0487,West,2025-05-26,weather,Cold Snap,14.9,Frozen|Bakery,0.43
+EVT-0488,South,2026-03-09,weather,Snowstorm,-13.2,Frozen|PersonalCare|HouseholdCare,0.41
+EVT-0489,East,2024-09-02,holiday,Independence Day,18.0,Frozen|Dairy,0.6
+EVT-0490,East,2026-03-16,festival,Food Truck Rally,9.8,PersonalCare,0.82
+EVT-0491,West,2025-02-03,weather,Heavy Rain,6.4,Bakery|Snack,0.45
+EVT-0492,West,2024-08-19,weather,Heatwave,17.0,Bakery|HouseholdCare|Snack,0.5
+EVT-0493,East,2024-10-14,weather,Storm,14.0,Beverage|Bakery|Frozen,0.78
+EVT-0494,West,2026-03-09,weather,Storm,1.0,HouseholdCare|Bakery,0.66
+EVT-0495,Central,2025-12-22,weather,Cold Snap,-12.5,Bakery|Beverage|Frozen,0.61
+EVT-0496,North,2025-03-03,weather,Heavy Rain,-4.1,Frozen|Snack,0.93
+EVT-0497,Central,2025-09-15,weather,Storm,-13.3,Beverage|Dairy|HouseholdCare,0.8
+EVT-0498,North,2026-04-20,weather,Storm,-5.3,Frozen|Dairy,0.89
+EVT-0499,South,2024-12-09,weather,Heavy Rain,-1.4,Snack|Bakery|HouseholdCare,0.47
+EVT-0500,North,2025-06-16,festival,Food Truck Rally,22.6,Snack,0.57

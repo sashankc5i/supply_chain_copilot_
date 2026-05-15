@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"d:/gen_ai_project/scripts\" \"d:/gen_ai_project/data/raw\" \"d:/gen_ai_project/data/processed\" \"d:/gen_ai_project/data/runtime\")"
+    ],
+    "additionalDirectories": [
+      "d:\\gen_ai_project"
+    ]
+  }
+}
