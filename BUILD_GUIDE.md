@@ -51,9 +51,9 @@ START -> detect ─┬─> retrieve_evidence -> diagnose -> recommend -> critiqu
 
 | Layer            | Choice                                                      |
 |------------------|-------------------------------------------------------------|
-| LLM              | `claude-sonnet-4-6` via `langchain-anthropic`, `temperature=0` |
+| LLM              | Azure OpenAI `gpt-4o-mini` via `langchain-openai.AzureChatOpenAI`, `temperature=0` |
 | Graph framework  | LangGraph 0.2+                                              |
-| Tracing          | LangSmith                                                   |
+| Tracing          | none (LangSmith intentionally omitted)                      |
 | Data             | pandas + CSV (no DB)                                        |
 | API              | FastAPI                                                     |
 | Dashboard        | Streamlit                                                   |
@@ -102,20 +102,30 @@ python -m venv .venv
 # Install deps
 pip install -r requirements.txt
 
-# Create .env at the project root
+# Create .env at the project root (Azure OpenAI; LangSmith not used)
 @'
-ANTHROPIC_API_KEY=sk-ant-...
-LANGCHAIN_API_KEY=lsv2_pt_...
-LANGCHAIN_TRACING_V2=true
-LANGCHAIN_PROJECT=supply-chain-copilot
+AZURE_OPENAI_ENDPOINT="https://<your-resource>.openai.azure.com/"
+AZURE_OPENAI_OPENAI_ENDPOINT="https://<your-resource>.openai.azure.com/openai/v1/"
+AZURE_OPENAI_API_KEY="<your-azure-openai-api-key>"
+AZURE_OPENAI_MODEL_NAME="gpt-4o-mini"
+AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4o-mini"
+AZURE_OPENAI_API_VERSION="2024-08-01-preview"
 '@ | Out-File -FilePath .env -Encoding utf8
 ```
 
 ### Verification
 
 ```powershell
-python -c "import langgraph, langchain_anthropic, pandas, streamlit; print('ok')"
+python -c "import langgraph, langchain_openai, pandas, streamlit; print('ok')"
 ```
+
+Then verify the LLM is reachable (one round-trip, costs a few tokens):
+
+```powershell
+python src/graph/llm.py
+```
+
+Prints `LLM configured: ...` followed by the model's `ok` response.
 
 Prints `ok` — all imports resolved.
 
@@ -327,8 +337,9 @@ Streamlit can show a live alert list from `state["demand_signals"]`.
   HIGH (DOH<5), MEDIUM (5≤DOH≤10), LOW (DOH>10). Sets `anomaly_type` to
   `spike`, `drop`, `flat_line` (units=0), or `normal`.
 - `diagnose` builds a structured prompt from the evidence dict + flagged
-  demand_signal, calls Claude Sonnet 4.6 with `temperature=0`, and parses
-  JSON output into `RootCauseHypothesis` dicts.
+  demand_signal, calls Azure OpenAI `gpt-4o-mini` (via
+  `src.graph.llm.get_llm()`, `temperature=0`), and parses JSON output into
+  `RootCauseHypothesis` dicts.
 
 **Why it matters:** detect is pure pandas — no LLM cost, must run in <5s on
 200 SKUs × 50 stores. Diagnose is where the LLM earns its keep: it reads
@@ -575,10 +586,10 @@ Dashboard is presentation-ready.
 ### Features delivered
 - `eval/run_evals.py` writes `eval_results.json` with precision, recall, LLM
   judge score, and per-node latency.
-- LangSmith traces show parallel tool calls, routing decisions, retry loops.
+- Local node-level timing logs persisted to `data/runtime/node_latency.csv`
+  (substitute for LangSmith — see Phase 4 [P3]).
 - Interactive what-if simulation panel.
-- Polished dashboard with loading states, trace-link buttons, approval
-  confirmations.
+- Polished dashboard with loading states, approval confirmations.
 
 ### Tasks
 
@@ -602,7 +613,8 @@ is the difference between a prototype and an enterprise-grade demo.
 - `eval/test_cases.json` — labeled scenarios (3 demo + 10-15 organic
   anomalies pulled from `anomalies_labeled.csv`).
 - `eval/rubric.py` — `score_recommendation(recs, hypotheses,
-  ground_truth_cause) -> int`. Uses Claude Sonnet 4.6 as judge.
+  ground_truth_cause) -> int`. Uses `src.graph.llm.get_llm()` (Azure OpenAI
+  gpt-4o-mini) as judge.
 - `eval/run_evals.py` — main runner, writes `eval/eval_results.json`.
 
 **Commands:**
@@ -610,21 +622,31 @@ is the difference between a prototype and an enterprise-grade demo.
 python eval/run_evals.py
 ```
 
-#### [P3] LangSmith trace quality
+#### [P3] Local trace quality (substitute for LangSmith)
 
-**What it is:** make every node emit clean traceable spans showing inputs,
-outputs, tool calls, and routing decisions.
+**What it is:** since LangSmith isn't being used, instrument every node to
+log node-name, input-size, output-size, latency, and routing decision to
+`data/runtime/node_latency.csv`. The dashboard surfaces this as a per-alert
+"Run breakdown" panel so evaluators can still see the agent's decisions.
 
-**Why it matters:** evaluators will click on a trace and look for: parallel
-tool calls in retrieve_evidence, retry-loop iteration count, routing
-decision evidence, prompt+completion for each LLM call. Sloppy traces lose
-credibility instantly.
+**Why it matters:** evaluators care about *what the agent decided and why*.
+Without a hosted trace UI, the dashboard becomes the explainability surface
+— the run breakdown shows each node's input summary, output summary, and
+the routing decision that followed.
 
 **How:**
-- Add `@traceable` decorator from `langsmith` to each node function (or
-  rely on LangGraph's auto-tracing if LANGCHAIN_TRACING_V2=true).
-- Set `LANGCHAIN_PROJECT=supply-chain-copilot` in `.env`.
-- Verify each demo scenario produces a clean trace URL — paste in README.
+- Add a small `src/graph/tracing.py` helper exposing
+  `@log_node(name)` — a decorator that times the call, captures
+  `state.run_id`, summarises in/out keys, and appends a row to
+  `data/runtime/node_latency.csv`.
+- Wrap every node function with `@log_node("detect")`,
+  `@log_node("diagnose")`, etc.
+- Build `dashboard/components/run_breakdown.py` to render the per-run rows
+  as an ordered list with timing bars.
+
+**Files created:**
+- `src/graph/tracing.py` — `log_node` decorator.
+- `dashboard/components/run_breakdown.py`.
 
 #### [Lead] Demo polish
 
@@ -638,8 +660,8 @@ to click, what to point at in the trace, expected outputs verbatim.
 #### [P5] Dashboard polish + HITL UX
 
 **What it is:** loading spinners during graph.invoke, error states for tool
-failures, "View LangSmith trace" button per alert (deep-links to LangSmith
-UI), approval confirmation modal.
+failures, per-alert "Run breakdown" panel rendering rows from
+`data/runtime/node_latency.csv`, approval confirmation modal.
 
 #### [P4] What-if simulation UI
 
@@ -747,6 +769,9 @@ python eval/run_evals.py
 
 # 8. Open static wireframe (Phase 1)
 start dashboard\dashboard.html
+
+# 9. Sanity-check the LLM client (Phase 0+ verification, one round-trip)
+python src/graph/llm.py
 ```
 
 ---
@@ -778,17 +803,25 @@ Re-run the generator — the CSVs may have been truncated mid-write:
 python scripts/generate_data.py
 ```
 
-### LangSmith trace shows no nodes
+### Azure OpenAI errors
 
-Check `.env`:
-```
-LANGCHAIN_TRACING_V2=true
-LANGCHAIN_API_KEY=lsv2_pt_...
-LANGCHAIN_PROJECT=supply-chain-copilot
-```
+**`RuntimeError: Missing required env vars: ...`** —
+`src/graph/llm.py` couldn't find one of `AZURE_OPENAI_ENDPOINT`,
+`AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`,
+`AZURE_OPENAI_DEPLOYMENT_NAME`. Confirm `.env` has all four and that
+`load_dotenv()` ran (entry points include it; in a REPL you must call
+`from dotenv import load_dotenv; load_dotenv()` once).
 
-Restart any running Streamlit/FastAPI process — env vars are read at
-process start.
+**`openai.AuthenticationError: 401`** — the key is wrong or has been rotated.
+Regenerate in Azure Portal → your OpenAI resource → Keys and Endpoint.
+
+**`openai.NotFoundError: The API deployment for this resource does not exist`** —
+`AZURE_OPENAI_DEPLOYMENT_NAME` doesn't match a deployment under the
+configured endpoint. Check Azure Portal → Deployments.
+
+**`openai.BadRequestError: API version not supported`** —
+bump `AZURE_OPENAI_API_VERSION` to a value listed in your resource's
+"API versions" tab.
 
 ### Streamlit shows "Connection refused" on /approval
 

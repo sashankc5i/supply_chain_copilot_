@@ -167,9 +167,12 @@ Body: `{sku_id, store_id, qty_adjust, promo_shift_days}` → returns what_if_sim
 ## 5. Determinism rules
 
 - `np.random.seed(42)` everywhere stochastic.
-- LLM `temperature=0` for `diagnose` and `recommend`.
+- LLM: Azure OpenAI `gpt-4o-mini` via `src.graph.llm.get_llm()`,
+  `temperature=0` for `diagnose`, `recommend`, and `eval/rubric.py` judge.
 - Anchor "this week" = `date(2026, 5, 11)` (matches `scripts/generate_data.py`).
 - All ISO dates in UTC; no timezone-aware datetimes cross tool boundaries.
+- LangSmith tracing is not used; per-node latency + routing decisions are
+  appended to `data/runtime/node_latency.csv` instead.
 
 ---
 

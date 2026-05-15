@@ -3,12 +3,12 @@ pandas>=2.0
 numpy>=1.24
 Faker>=22.0
 
-# LangGraph copilot core (per design doc tech stack)
+# LangGraph copilot core
+# LLM: Azure OpenAI (gpt-4o-mini) via langchain-openai.
+# LangSmith intentionally omitted -- no remote tracing in this build.
 langgraph>=0.2
 langchain>=0.2
 langchain-openai>=0.1
-langchain-anthropic>=0.1
-langsmith>=0.1
 
 # API + dashboard
 fastapi>=0.110
