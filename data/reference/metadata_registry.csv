@@ -1,0 +1,12 @@
+file,format,rows,key_fields,used_by
+sku_demand_data/sku_store_week_demand.json,JSON,1600,"sku_id, store_id, week, actual_demand_units, forecast_demand_units, is_anomaly_week, anomaly_type","demand_data_tool, detect_node"
+inventory_snapshots/inventory_snapshots.json,JSON,1600,"sku_id, store_id, week, stock_on_hand_units, weeks_of_cover, inventory_status, estimated_stockout_date","inventory_lookup_tool, detect_node, recommend_node"
+promotion_calendar/promotion_calendar.json,JSON,6,"promo_id, promo_name, skus, regions, start_date, end_date, expected_uplift_pct, actual_uplift_pct","promotion_calendar_tool, diagnose_node"
+supplier_delay_logs/supplier_delay_logs.json,JSON,5,"delay_id, supplier_id, affected_skus, delay_days, severity, mitigation_available","supplier_status_tool, diagnose_node, recommend_node"
+weather_event_data/weather_event_signals.json,JSON,6,"event_type, regions_affected, affected_skus, historical_demand_impact, severity","weather_event_tool, diagnose_node"
+shipment_data/shipment_data.json,JSON,1631,"sku_id, destination_region, planned_arrival_date, actual_arrival_date, delay_days, shipment_status",shipment_tracker_tool
+service_level_targets/service_level_targets.json,JSON,10,"sku_id, target_fill_rate_pct, target_weeks_of_cover_min/max, criticality, hitl_required_above_inr, auto_approve_below_inr","sl_target_lookup_tool, recommend_node, critique_node"
+agent_outputs/langgraph_scenario_traces.json,JSON,5,"scenario_id, anomaly_type, detect/diagnose/recommend/critique/hitl node outputs",Demo gold standard + evaluation
+agent_outputs/whatif_simulation_results.json,JSON,5,"sim_id, action, units, before/after cover, stockout_avoided, cost_inr",what_if_simulation_tool
+agent_outputs/agent_trace_log.json,JSON,85,"trace_id, node, tool_called, status, latency_ms, tokens, cost_usd",Observability dashboard
+evaluation_set/sc_eval_benchmark.json,JSON,12,"eval_id, demo_step, query, test_type, expected_finding, value_demonstrated",Evaluation framework

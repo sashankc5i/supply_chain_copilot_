@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_RAW = ROOT / "data" / "raw"
 DATA_PROC = ROOT / "data" / "processed"
 DATA_RUN = ROOT / "data" / "runtime"
+DATA_REF = ROOT / "data" / "reference"     # P5 official-dataset extracts (reference only)
 
 ANCHOR_DATE = date(2026, 5, 11)
 
@@ -89,6 +90,35 @@ def load_action_log() -> pd.DataFrame:
     )
 
 
+def load_reference(filename: str):
+    """Load a borrowed P5-dataset artifact from `data/reference/`.
+
+    Reference files are **not aligned with our generated SKU/store IDs** --
+    use them for design inspiration, eval templates, and gold-standard
+    examples only. See `data/reference/README.md` for the catalogue.
+
+    Returns a `pd.DataFrame` for .csv files and a parsed Python object
+    (dict / list) for .json files. Markdown is returned as a string.
+    """
+    import json
+
+    path = DATA_REF / filename
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{filename} not found under data/reference/. "
+            "Did you extract P5_LangGraph_SupplyChain_SyntheticDataset.zip?"
+        )
+    suffix = path.suffix.lower()
+    if suffix == ".csv":
+        return pd.read_csv(path)
+    if suffix == ".json":
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    if suffix == ".md":
+        return path.read_text(encoding="utf-8")
+    raise ValueError(f"Unsupported reference file type: {suffix}")
+
+
 def reload_all() -> None:
     """Bust every cached loader. Call after regenerating CSVs in-process."""
     for fn in (
@@ -105,8 +135,9 @@ def _has_rows(path: Path) -> bool:
 
 
 __all__ = [
-    "ROOT", "DATA_RAW", "DATA_PROC", "DATA_RUN", "ANCHOR_DATE",
+    "ROOT", "DATA_RAW", "DATA_PROC", "DATA_RUN", "DATA_REF", "ANCHOR_DATE",
     "load_skus", "load_locations", "load_demand", "load_inventory",
     "load_promos", "load_weather", "load_suppliers",
-    "load_labeled_anomalies", "load_action_log", "reload_all",
+    "load_labeled_anomalies", "load_action_log",
+    "load_reference", "reload_all",
 ]

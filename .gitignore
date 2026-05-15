@@ -3,6 +3,12 @@ data/raw/
 data/runtime/
 data/processed/
 
+# Unzipped P5 official dataset (large; selectively copied into data/reference/)
+data/P5_LangGraph_SupplyChain_SyntheticDataset/
+data/*.zip
+
+# data/reference/ IS committed -- it's the curated subset we borrowed from P5
+
 # Evaluation outputs
 eval/eval_results.json
 eval/eval_results.md

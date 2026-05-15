@@ -1,0 +1,129 @@
+[
+  {
+    "eval_id": "EV-001",
+    "demo_step": 2,
+    "query": "Which SKUs are at risk of stockout next week and why?",
+    "test_type": "Threshold Rule Baseline",
+    "expected_output": "Simple threshold: flags SKU-001 (North) and SKU-002 (East) as low cover. DOES NOT explain root cause. Cannot distinguish supplier failure (SC-002) from promotion spike (SC-001). Cannot detect data anomaly (SC-005). False positive rate: high.",
+    "correct_root_cause": "UNKNOWN to rule",
+    "scenario": "SC-001",
+    "value_demonstrated": "Rules detect anomalies but cannot explain or contextualise them"
+  },
+  {
+    "eval_id": "EV-002",
+    "demo_step": 3,
+    "query": "Summarize the demand and inventory tables for this week.",
+    "test_type": "LLM Table Reasoning",
+    "expected_output": "LLM summarizes numbers but cannot reliably: (a) compute weeks-of-cover from SOH + demand, (b) cross-reference promo calendar, (c) distinguish supply-side vs demand-side anomaly. Math errors likely on large tables.",
+    "correct_root_cause": "PARTIAL",
+    "scenario": "SC-002",
+    "value_demonstrated": "Table reasoning is fragile \u2014 tools and formulas needed"
+  },
+  {
+    "eval_id": "EV-003",
+    "demo_step": 4,
+    "query": "Why did SKU-002 and SKU-005 demand appear to collapse in East and Central?",
+    "test_type": "Tool Call \u2014 Root Cause",
+    "expected_agent_path": "demand_data_tool \u2192 inventory_lookup_tool \u2192 supplier_status_tool",
+    "expected_finding": "SUPPLIER FAILURE (not demand collapse): SUP-B 10-day production shutdown. 4,200 units SKU-002 + 1,800 units SKU-005 delayed. Demand is normal \u2014 supply has been cut.",
+    "correct_root_cause": "SUPPLIER_DELAY (DEL-001)",
+    "scenario": "SC-002",
+    "value_demonstrated": "Tool calls resolve the demand-vs-supply ambiguity that LLM alone cannot"
+  },
+  {
+    "eval_id": "EV-004",
+    "demo_step": 5,
+    "query": "Route this exception: SKU-002 East, weeks-of-cover 0.4, demand normal.",
+    "test_type": "LangGraph Routing",
+    "expected_routing": "detect_node (CRITICAL) \u2192 diagnose_node \u2192 recommend_node \u2192 critique_node \u2192 escalate_node (HITL mandatory \u2014 cost > INR 100K + new supplier activation)",
+    "routing_rule": "CRITICAL severity + cost > INR 100K \u2192 mandatory HITL (SCM Director)",
+    "scenario": "SC-002",
+    "value_demonstrated": "Severity-based routing prevents both under-reaction (no action) and over-reaction (auto-execute high-cost)"
+  },
+  {
+    "eval_id": "EV-005",
+    "demo_step": 6,
+    "query": "What is the root cause of SKU-003 and SKU-010 demand spike in South and West in W11?",
+    "test_type": "Root Cause Node \u2014 Compound Signal",
+    "expected_finding": "Compound signal: Heatwave (WE-001) + PROMO-003 Summer Campaign active simultaneously. Cannot deconvolve without MMM. Confidence capped at 0.85. Competitor BrewRush price cut (WE-006) has limited impact \u2014 demand is UP, not down.",
+    "confidence": "MEDIUM-HIGH (0.85) with compound signal caveat",
+    "scenario": "SC-003",
+    "value_demonstrated": "Root-cause node correctly caveats compound signals rather than over-claiming"
+  },
+  {
+    "eval_id": "EV-006",
+    "demo_step": 7,
+    "query": "Generate a recommendation for SKU-003 stockout risk in South.",
+    "test_type": "Recommend Node \u2014 Multi-Action",
+    "expected_recommendations": [
+      "REC-003A: Expedite 700 units from SUP-C (requires QA clearance \u2014 flagged)",
+      "REC-003B: Transfer 300 units North DC \u2192 South (auto-approved, immediate)",
+      "REC-003C: Watch SKU-010 \u2014 no action yet"
+    ],
+    "hitl_required": "REC-003A \u2014 cost INR 87,000 + QA constraint",
+    "scenario": "SC-003",
+    "value_demonstrated": "Multi-action recommendation with differentiated urgency and HITL routing"
+  },
+  {
+    "eval_id": "EV-007",
+    "demo_step": 8,
+    "query": "Validate the SKU-003 recommendation \u2014 is it supported by evidence and are constraints met?",
+    "test_type": "Critique Node",
+    "expected_critique_output": "PASS with flags: (1) compound signal noted \u2014 recommend confidence 0.79, (2) QA clearance required for SUP-C alt bean grade \u2014 correctly flagged as constraint, (3) weather forecast shows cooling from Mar 17 \u2014 expedite 700 not 1000 units (HITL edited to 700)",
+    "critique_status": "PASS_WITH_FLAGS",
+    "scenario": "SC-003",
+    "value_demonstrated": "Critique node catches constraint (QA clearance) and prevents over-ordering"
+  },
+  {
+    "eval_id": "EV-008",
+    "demo_step": 9,
+    "query": "[HITL] The system recommends expediting 1000 units SKU-003 at INR 124,000. Approve, reject, or edit?",
+    "test_type": "HITL Approval Flow",
+    "expected_hitl_action": "APPROVED_WITH_EDIT: Reduce to 700 units (heatwave cooling forecast + QA approved alt grade). Cost revised INR 87,000.",
+    "approver": "SCM Director",
+    "scenario": "SC-003",
+    "value_demonstrated": "HITL allows human judgment (weather forecast horizon) to refine AI recommendation"
+  },
+  {
+    "eval_id": "EV-009",
+    "demo_step": 8,
+    "query": "Validate the SKU-004 overstock recommendation \u2014 should we expedite the SUP-D delayed batch?",
+    "test_type": "Critique Node \u2014 Counter-Intuitive Finding",
+    "expected_critique_output": "REC-004C: DO NOT EXPEDITE SUP-D batch. Delay is beneficial given 4.8x overstock. Critique validates counter-intuitive finding \u2014 supplier delay + overstock = do nothing on supply side.",
+    "critique_status": "PASS",
+    "scenario": "SC-004",
+    "value_demonstrated": "Critique node validates counter-intuitive non-action recommendation"
+  },
+  {
+    "eval_id": "EV-010",
+    "demo_step": 6,
+    "query": "SKU-008 demand appears to have spiked 3x. Should we expedite replenishment?",
+    "test_type": "Data Anomaly Detection",
+    "expected_finding": "DATA ANOMALY: Demand signal (3x) contradicts inventory signal (2.2 weeks cover unchanged). POS system glitch during flash sale. DO NOT EXPEDITE. Flag to IT team. Estimated false-positive cost avoided: INR 85,000.",
+    "correct_action": "FLAG_DATA_QUALITY \u2014 no supply action",
+    "scenario": "SC-005",
+    "value_demonstrated": "Cross-signal contradiction detection prevents false-positive INR 85,000 expedite order"
+  },
+  {
+    "eval_id": "EV-011",
+    "demo_step": 5,
+    "query": "Route SKU-008 exception: 3x demand spike, cover 2.2 weeks, cover unchanged.",
+    "test_type": "LangGraph Routing \u2014 Data Anomaly Path",
+    "expected_routing": "detect_node \u2192 diagnose_node (contradiction detected) \u2192 DATA_ANOMALY route \u2192 flag_node (NOT recommend_node)",
+    "routing_rule": "DATA_ANOMALY detected \u2192 suspend action path",
+    "scenario": "SC-005",
+    "value_demonstrated": "Data anomaly route prevents erroneous recommendation generation"
+  },
+  {
+    "eval_id": "EV-012",
+    "demo_step": 9,
+    "query": "Compare total cost and false positive rate: threshold-only system vs LangGraph copilot across 5 scenarios.",
+    "test_type": "System Comparison",
+    "threshold_system_actions": "Would trigger 5 expedite/transfer orders including SC-005 false positive (~INR 85,000 wasted); no root cause; no HITL; no constraint check",
+    "langgraph_system_actions": "SC-001: transfer + targeted expedite (HITL edited to 400u). SC-002: backup supplier + transfer (approved). SC-003: bridge transfer + expedite (HITL edited to 700u). SC-004: redistribute (no expedite). SC-005: FLAG only \u2014 no action.",
+    "estimated_cost_saving_inr": 127000,
+    "false_positives_prevented": 1,
+    "hitl_edits": 3,
+    "value_demonstrated": "Multi-node LangGraph with critique + HITL outperforms threshold rules on cost, accuracy, and actionability"
+  }
+]

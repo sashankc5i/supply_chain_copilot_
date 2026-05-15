@@ -191,6 +191,12 @@ per process — anything else makes the graph slow.
 - [data/processed/anomalies_labeled.csv](data/processed/anomalies_labeled.csv) —
   ground-truth labels for eval.
 - [data/runtime/action_log.csv](data/runtime/action_log.csv) — header-only.
+- [data/reference/](data/reference/) — 11 borrowed artifacts from the
+  official P5 dataset (HITL thresholds, eval benchmark, gold-standard
+  scenario traces, state-schema reference, what-if expected output, demo
+  narrative). **Reference-only** — IDs don't align with our generated data;
+  read via `load_reference(filename)`. See
+  [data/reference/README.md](data/reference/README.md) for the catalogue.
 - [src/data/loaders.py](src/data/loaders.py) — `load_skus`, `load_locations`,
   `load_demand`, `load_inventory`, `load_promos`, `load_weather`,
   `load_suppliers`, `load_labeled_anomalies`, `load_action_log`,

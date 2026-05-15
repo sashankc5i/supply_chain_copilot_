@@ -1,0 +1,579 @@
+[
+  {
+    "scenario_id": "SC-001",
+    "week": "2025-W07",
+    "trigger_question": "Which SKUs are at risk of stockout next week and why?",
+    "anomaly_type": "PROMOTION_SPIKE",
+    "affected_skus": "SKU-001|SKU-007",
+    "affected_regions": "North",
+    "severity": "HIGH",
+    "detect_node": {
+      "exceptions_raised": [
+        {
+          "exception_id": "EX-001",
+          "sku": "SKU-001",
+          "store_ids": "STR-002|STR-009",
+          "region": "North",
+          "weeks_of_cover": 0.7,
+          "status": "STOCKOUT_RISK",
+          "demand_spike_pct": 145,
+          "alert_type": "LOW_INVENTORY_HIGH_DEMAND"
+        },
+        {
+          "exception_id": "EX-002",
+          "sku": "SKU-007",
+          "store_ids": "STR-002|STR-009",
+          "region": "North",
+          "weeks_of_cover": 0.9,
+          "status": "STOCKOUT_RISK",
+          "demand_spike_pct": 120,
+          "alert_type": "LOW_INVENTORY_HIGH_DEMAND"
+        }
+      ],
+      "tool_calls": [
+        "demand_data_tool(SKU-001,North,W07)",
+        "inventory_lookup_tool(SKU-001,North)",
+        "demand_data_tool(SKU-007,North,W07)",
+        "inventory_lookup_tool(SKU-007,North)"
+      ],
+      "latency_ms": 1240
+    },
+    "diagnose_node": {
+      "root_cause_hypotheses": [
+        {
+          "hypothesis": "HOLI_PROMO_UPLIFT",
+          "confidence": 0.89,
+          "evidence": "PROMO-001 active since W05 \u2014 145% actual uplift vs 120% forecast. Holi in-store display at STR-002 confirmed. Historical Holi uplift 110-140% \u2014 this wave is top of range.",
+          "rank": 1
+        },
+        {
+          "hypothesis": "REGIONAL_FESTIVE_DEMAND",
+          "confidence": 0.72,
+          "evidence": "North region festive calendar shows elevated demand in W05-W09. Pre-Holi gifting purchases observable in SKU-007 search trends.",
+          "rank": 2
+        },
+        {
+          "hypothesis": "INVENTORY_POSITIONING_MISS",
+          "confidence": 0.81,
+          "evidence": "Inventory was pre-positioned for 120% uplift but actual demand hit 145%. 25pp gap = 300 units understocked at STR-002 alone.",
+          "rank": 3
+        }
+      ],
+      "tool_calls": [
+        "promotion_calendar_tool(PROMO-001)",
+        "weather_event_tool(North,W07)",
+        "supplier_status_tool(SUP-A)"
+      ],
+      "latency_ms": 2180
+    },
+    "recommend_node": {
+      "recommendations": [
+        {
+          "rec_id": "REC-001A",
+          "action": "INTER_STORE_TRANSFER",
+          "description": "Transfer 400 units SKU-001 from STR-008 (Ahmedabad, 3.2 weeks cover) to STR-002 (Delhi, 0.7 weeks cover)",
+          "urgency": "IMMEDIATE",
+          "cost_inr": 8500,
+          "service_level_impact": "Prevents stockout at STR-002; minor cover reduction at STR-008 (3.2\u21922.6 weeks \u2014 within SL target)",
+          "hitl_required": false,
+          "auto_approve": true,
+          "constraint_check": "Cost INR 8,500 < auto-approve threshold INR 25,000"
+        },
+        {
+          "rec_id": "REC-001B",
+          "action": "EXPEDITE_REPLENISHMENT",
+          "description": "Expedite 600 units SKU-001 from SUP-A (3-day fast track available)",
+          "urgency": "HIGH",
+          "cost_inr": 42000,
+          "service_level_impact": "Closes stockout risk within 3 days; eliminates lost sales risk",
+          "hitl_required": true,
+          "auto_approve": false,
+          "constraint_check": "Cost INR 42,000 > auto-approve; < HITL INR 100,000 \u2014 branch manager approval"
+        }
+      ],
+      "what_if_simulation": {
+        "transfer_scenario": "STR-008 cover post-transfer: 2.6 weeks (above 2.0 minimum). STR-002 cover post-transfer: 2.1 weeks. Stockout averted.",
+        "expedite_scenario": "Full demand coverage through W09. No lost sales. Incremental cost: INR 42,000."
+      },
+      "tool_calls": [
+        "what_if_simulation_tool(TRANSFER,SKU-001,STR-008,STR-002,400)",
+        "sl_target_lookup_tool(SKU-001)"
+      ],
+      "latency_ms": 1890
+    },
+    "critique_node": {
+      "status": "PASS",
+      "evidence_check": "Both recommendations supported by demand data, inventory data, and promo calendar",
+      "constraint_check": "Inter-store transfer: cost within auto-approve threshold. Expedite: correctly flagged for HITL.",
+      "confidence_overall": 0.87,
+      "flags": [
+        "RECOMMENDATION: Execute inter-store transfer immediately (auto-approved). Escalate expedite to branch manager."
+      ],
+      "latency_ms": 820
+    },
+    "hitl_outcome": {
+      "rec_id": "REC-001B",
+      "status": "APPROVED_WITH_EDIT",
+      "approver": "Branch Manager North",
+      "edit": "Reduce expedite to 400 units (not 600) \u2014 STR-002 inter-store transfer covers 200 units; 400 unit expedite sufficient",
+      "final_cost_inr": 28000,
+      "approved_at": "2025-02-03 14:32"
+    },
+    "total_cost_usd": 0.62,
+    "total_latency_seconds": 12.4,
+    "total_tool_calls": 9,
+    "failed_tool_calls": 0
+  },
+  {
+    "scenario_id": "SC-002",
+    "week": "2025-W09",
+    "trigger_question": "Why did SKU-002 demand collapse in East and Central regions? And why is SKU-005 at stockout?",
+    "anomaly_type": "SUPPLIER_DELAY",
+    "affected_skus": "SKU-002|SKU-005",
+    "affected_regions": "East|Central",
+    "severity": "CRITICAL",
+    "detect_node": {
+      "exceptions_raised": [
+        {
+          "exception_id": "EX-003",
+          "sku": "SKU-002",
+          "store_ids": "STR-004|STR-010",
+          "region": "East|Central",
+          "weeks_of_cover": 0.4,
+          "status": "STOCKOUT_RISK",
+          "demand_spike_pct": 0,
+          "alert_type": "SUPPLY_FAILURE_LOW_INVENTORY",
+          "note": "Demand is normal \u2014 supply has been cut"
+        },
+        {
+          "exception_id": "EX-004",
+          "sku": "SKU-005",
+          "store_ids": "STR-004|STR-010",
+          "region": "East|Central",
+          "weeks_of_cover": 0.3,
+          "status": "STOCKOUT_RISK",
+          "demand_spike_pct": 0,
+          "alert_type": "SUPPLY_FAILURE_CRITICAL",
+          "estimated_stockout_date": "2025-02-19"
+        }
+      ],
+      "tool_calls": [
+        "demand_data_tool(SKU-002,East,W09)",
+        "inventory_lookup_tool(SKU-002,East)",
+        "demand_data_tool(SKU-005,Central,W09)",
+        "inventory_lookup_tool(SKU-005,Central)"
+      ],
+      "latency_ms": 1380
+    },
+    "diagnose_node": {
+      "root_cause_hypotheses": [
+        {
+          "hypothesis": "SUPPLIER_PRODUCTION_SHUTDOWN",
+          "confidence": 0.97,
+          "evidence": "DEL-001: SUP-B confirmed 10-day production line shutdown. 4,200 units SKU-002 + 1,800 units SKU-005 delayed. Revised ETA Feb 27. This is supply-side failure, NOT demand anomaly.",
+          "rank": 1
+        },
+        {
+          "hypothesis": "DEMAND_CANNIBALIZATION",
+          "confidence": 0.08,
+          "evidence": "No evidence of demand shift \u2014 category sales in East/Central normal. Ruled out.",
+          "rank": 2
+        }
+      ],
+      "key_insight": "CRITICAL DISTINCTION: Demand is NOT anomalous \u2014 the inventory drop is purely supply-driven. A threshold-only system would misread this as a demand crash. Root-cause node correctly identifies supplier failure.",
+      "tool_calls": [
+        "supplier_status_tool(SUP-B)",
+        "demand_data_tool(SKU-002,East,W09)",
+        "weather_event_tool(East,W09)"
+      ],
+      "latency_ms": 2640
+    },
+    "recommend_node": {
+      "recommendations": [
+        {
+          "rec_id": "REC-002A",
+          "action": "ACTIVATE_BACKUP_SUPPLIER",
+          "description": "Activate SUP-F (QuickSource Alt) for 30% SKU-002 volume \u2014 1,260 units. SUP-F lead time 7 days.",
+          "urgency": "CRITICAL",
+          "cost_inr": 62000,
+          "service_level_impact": "Partial coverage \u2014 covers 30% demand through W11. Remaining 70% gap requires cross-region transfer.",
+          "hitl_required": true,
+          "constraint_check": "SUP-F max capacity 30% per SOP \u2014 cannot exceed. New supplier activation requires SCM Director approval."
+        },
+        {
+          "rec_id": "REC-002B",
+          "action": "CROSS_REGION_INVENTORY_TRANSFER",
+          "description": "Transfer 1,800 units SKU-002 from West DC (excess 4.5 weeks cover) to East region stores",
+          "urgency": "CRITICAL",
+          "cost_inr": 38000,
+          "service_level_impact": "Covers 43% of demand gap. Combined with SUP-F: 73% gap closed.",
+          "hitl_required": true,
+          "constraint_check": "Cost INR 38,000 > auto-approve. Requires branch approval."
+        },
+        {
+          "rec_id": "REC-002C",
+          "action": "NO_ALTERNATIVE_SKU005",
+          "description": "No alternative supplier available for SKU-005. Stockout unavoidable unless expedite from SUP-B possible.",
+          "urgency": "CRITICAL",
+          "cost_inr": 0,
+          "service_level_impact": "SKU-005 stockout expected Feb 19-27 (8 days). Lost sales estimate: INR 216,000. Recommend customer communication and substitution offer.",
+          "hitl_required": true,
+          "constraint_check": "ESCALATE TO SCM DIRECTOR \u2014 no mitigation fully closes gap"
+        }
+      ],
+      "tool_calls": [
+        "supplier_status_tool(SUP-F)",
+        "what_if_simulation_tool(BACKUP_SUPPLIER,SKU-002,SUP-F,1260)",
+        "what_if_simulation_tool(TRANSFER,SKU-002,WestDC,East,1800)"
+      ],
+      "latency_ms": 2210
+    },
+    "critique_node": {
+      "status": "PASS_WITH_FLAGS",
+      "flags": [
+        "REC-002C correctly identifies that no action fully closes SKU-005 gap \u2014 honest escalation, not false certainty",
+        "SUP-F activation requires SCM Director approval per supplier onboarding SOP \u2014 correctly flagged",
+        "Combined transfer + backup covers 73% of gap \u2014 critique validates math"
+      ],
+      "confidence_overall": 0.91,
+      "latency_ms": 1040
+    },
+    "hitl_outcome": {
+      "rec_id": "REC-002A+REC-002B",
+      "status": "APPROVED",
+      "approver": "SCM Director",
+      "edit": "None \u2014 approved as recommended. Additionally: issue customer advisory on SKU-005 availability.",
+      "final_cost_inr": 100000,
+      "approved_at": "2025-02-17 09:15"
+    },
+    "total_cost_usd": 0.89,
+    "total_latency_seconds": 16.8,
+    "total_tool_calls": 12,
+    "failed_tool_calls": 1
+  },
+  {
+    "scenario_id": "SC-003",
+    "week": "2025-W11",
+    "trigger_question": "SKU-003 and SKU-010 demand is spiking in South and West \u2014 what is driving this and should we expedite replenishment?",
+    "anomaly_type": "WEATHER_DEMAND_SPIKE",
+    "affected_skus": "SKU-003|SKU-010",
+    "affected_regions": "South|West",
+    "severity": "HIGH",
+    "detect_node": {
+      "exceptions_raised": [
+        {
+          "exception_id": "EX-005",
+          "sku": "SKU-003",
+          "region": "South|West",
+          "weeks_of_cover": 0.8,
+          "status": "STOCKOUT_RISK",
+          "demand_spike_pct": 80,
+          "alert_type": "HIGH_DEMAND_LOW_INVENTORY"
+        },
+        {
+          "exception_id": "EX-006",
+          "sku": "SKU-010",
+          "region": "South|West",
+          "weeks_of_cover": 1.1,
+          "status": "LOW",
+          "demand_spike_pct": 60,
+          "alert_type": "ELEVATED_DEMAND_MONITOR"
+        }
+      ],
+      "tool_calls": [
+        "demand_data_tool(SKU-003,South,W11)",
+        "demand_data_tool(SKU-003,West,W11)",
+        "inventory_lookup_tool(SKU-003,South)",
+        "inventory_lookup_tool(SKU-010,West)"
+      ],
+      "latency_ms": 1190
+    },
+    "diagnose_node": {
+      "root_cause_hypotheses": [
+        {
+          "hypothesis": "HEATWAVE_DEMAND_SIGNAL",
+          "confidence": 0.85,
+          "evidence": "WE-001: South India heatwave 43\u00b0C peak. Historical data: cold beverage +65-90% in sustained heat events. SKU-003 (Cold Brew) uplift 80% \u2014 consistent with heatwave range.",
+          "rank": 1
+        },
+        {
+          "hypothesis": "PROMO_003_EFFECT",
+          "confidence": 0.74,
+          "evidence": "PROMO-003 Summer Ready Campaign active since W11. 10% discount + in-store cooler placement. Expected uplift 60%.",
+          "rank": 2
+        },
+        {
+          "hypothesis": "COMPETITOR_CANNIBALISATION",
+          "confidence": 0.42,
+          "evidence": "WE-006: BrewRush Cold Brew -18% price. However, SKU-003 demand is UP not DOWN \u2014 competitor impact appears limited or offset by heatwave.",
+          "rank": 3
+        }
+      ],
+      "compound_signal_warning": "IMPORTANT: Cannot deconvolve heatwave effect from PROMO-003 effect without MMM. Both signals active simultaneously. Root cause confidence capped at 0.85 \u2014 recommendation should note this uncertainty.",
+      "supplier_complication": "DEL-003: SUP-C has 6-day delay on SKU-003 raw material. Expediting may hit supply constraint.",
+      "tool_calls": [
+        "weather_event_tool(South,W11)",
+        "promotion_calendar_tool(PROMO-003)",
+        "supplier_status_tool(SUP-C)",
+        "weather_event_tool(WE-006)"
+      ],
+      "latency_ms": 2890
+    },
+    "recommend_node": {
+      "recommendations": [
+        {
+          "rec_id": "REC-003A",
+          "action": "EXPEDITE_REPLENISHMENT_SKU003",
+          "description": "Expedite 1,000 units SKU-003 from SUP-C \u2014 request priority production slot; clear alternative bean grade with QA within 48hrs",
+          "urgency": "HIGH",
+          "cost_inr": 124000,
+          "service_level_impact": "Prevents stockout if SUP-C can deliver by Mar 9. Risk: QA clearance for alternative bean grade uncertain.",
+          "hitl_required": true,
+          "constraint_check": "Cost INR 124,000 > HITL threshold. Requires SCM Director + QA Director approval."
+        },
+        {
+          "rec_id": "REC-003B",
+          "action": "NORTH_TO_SOUTH_TRANSFER_SKU003",
+          "description": "Transfer 300 units SKU-003 from North DC (3.8 weeks cover) to South stores as bridge stock",
+          "urgency": "IMMEDIATE",
+          "cost_inr": 12000,
+          "service_level_impact": "Buys 4-5 days bridge stock. Reduces North cover from 3.8 to 3.1 weeks (within SL target).",
+          "hitl_required": false,
+          "auto_approve": true
+        },
+        {
+          "rec_id": "REC-003C",
+          "action": "WATCH_SKU010",
+          "description": "SKU-010 at 1.1 weeks cover \u2014 elevated but above stockout threshold. Monitor daily. No action this week.",
+          "urgency": "WATCH",
+          "cost_inr": 0,
+          "hitl_required": false
+        }
+      ],
+      "tool_calls": [
+        "what_if_simulation_tool(EXPEDITE,SKU-003,SUP-C,1000)",
+        "what_if_simulation_tool(TRANSFER,SKU-003,NorthDC,South,300)",
+        "sl_target_lookup_tool(SKU-003)"
+      ],
+      "latency_ms": 1980
+    },
+    "critique_node": {
+      "status": "PASS_WITH_FLAGS",
+      "flags": [
+        "Compound signal (heatwave+promo) noted \u2014 recommendation confidence appropriately limited",
+        "REC-003A correctly flags QA clearance uncertainty as a constraint \u2014 not a guaranteed fix",
+        "REC-003B auto-approve path correct \u2014 cost within threshold, impact within SL bounds",
+        "LIMITATION FLAGGED: Cannot confirm whether weather signal will sustain 3 more weeks \u2014 recommendation valid for short horizon only"
+      ],
+      "confidence_overall": 0.79,
+      "latency_ms": 1120
+    },
+    "hitl_outcome": {
+      "rec_id": "REC-003A",
+      "status": "APPROVED_WITH_EDIT",
+      "approver": "SCM Director",
+      "edit": "Expedite 700 units (not 1000) \u2014 heatwave forecast shows cooling from Mar 17. QA Director approved alternative bean grade.",
+      "final_cost_inr": 87000,
+      "approved_at": "2025-03-03 11:47"
+    },
+    "total_cost_usd": 0.78,
+    "total_latency_seconds": 14.2,
+    "total_tool_calls": 11,
+    "failed_tool_calls": 0
+  },
+  {
+    "scenario_id": "SC-004",
+    "week": "2025-W14",
+    "trigger_question": "SKU-004 West region is showing 4.2x weeks of cover \u2014 should we markdown or redistribute?",
+    "anomaly_type": "OVERSTOCK_CANCELLED_PO",
+    "affected_skus": "SKU-004",
+    "affected_regions": "West",
+    "severity": "MEDIUM",
+    "detect_node": {
+      "exceptions_raised": [
+        {
+          "exception_id": "EX-007",
+          "sku": "SKU-004",
+          "region": "West",
+          "weeks_of_cover": 4.8,
+          "status": "OVERSTOCK",
+          "demand_drop_pct": 100,
+          "alert_type": "OVERSTOCK_DEMAND_COLLAPSE",
+          "note": "Demand drop is 100% \u2014 corporate order cancelled, not a natural demand shift"
+        }
+      ],
+      "tool_calls": [
+        "inventory_lookup_tool(SKU-004,West)",
+        "demand_data_tool(SKU-004,West,W14)"
+      ],
+      "latency_ms": 890
+    },
+    "diagnose_node": {
+      "root_cause_hypotheses": [
+        {
+          "hypothesis": "CORPORATE_ORDER_CANCELLATION",
+          "confidence": 0.99,
+          "evidence": "PROMO-004: 2000-unit B2B corporate contract cancelled W12. Pre-positioned inventory at West DC now represents 4.8 weeks cover (SL max: 5.0 weeks). Demand has returned to normal organic baseline (40 units/week/tier-2 store).",
+          "rank": 1
+        },
+        {
+          "hypothesis": "DEMAND_DECLINE",
+          "confidence": 0.04,
+          "evidence": "Organic demand for SKU-004 flat WoW \u2014 not a demand decline. Ruled out.",
+          "rank": 2
+        }
+      ],
+      "supplier_note": "DEL-004: SUP-D quality hold on incoming batch is BENEFICIAL \u2014 do not expedite SKU-004. Delay helps inventory balance.",
+      "tool_calls": [
+        "promotion_calendar_tool(PROMO-004)",
+        "supplier_status_tool(SUP-D)",
+        "demand_data_tool(SKU-004,All,W12-W14)"
+      ],
+      "latency_ms": 1740
+    },
+    "recommend_node": {
+      "recommendations": [
+        {
+          "rec_id": "REC-004A",
+          "action": "INTER_REGION_REDISTRIBUTION",
+          "description": "Redistribute 800 units SKU-004 from West DC to East (200u), North (200u), South (200u), Central (200u)",
+          "urgency": "MEDIUM",
+          "cost_inr": 32000,
+          "service_level_impact": "Reduces West cover from 4.8 to 2.8 weeks. Improves cover in East/North/South/Central by 0.4-0.6 weeks.",
+          "hitl_required": false,
+          "auto_approve": true,
+          "constraint_check": "Cost INR 32,000 > auto-approve threshold INR 25,000 \u2014 branch manager approval needed"
+        },
+        {
+          "rec_id": "REC-004B",
+          "action": "PROMOTIONAL_MARKDOWN",
+          "description": "Apply 20% markdown on SKU-004 West stores for 3 weeks to accelerate sell-through",
+          "urgency": "LOW",
+          "cost_inr": 48000,
+          "service_level_impact": "Estimated sell-through acceleration: 1.5x. Revenue impact: -INR 48,000 over 3 weeks.",
+          "hitl_required": true,
+          "constraint_check": "Markdown requires Finance + Category Manager approval per policy"
+        },
+        {
+          "rec_id": "REC-004C",
+          "action": "DO_NOT_EXPEDITE_SUP-D",
+          "description": "Confirm no expediting of DEL-004 SUP-D batch \u2014 delay is beneficial given overstock position",
+          "urgency": "IMMEDIATE",
+          "cost_inr": 0,
+          "hitl_required": false
+        }
+      ],
+      "tool_calls": [
+        "what_if_simulation_tool(REDISTRIBUTE,SKU-004,West,AllRegions,800)",
+        "what_if_simulation_tool(MARKDOWN,SKU-004,West,20pct,3weeks)"
+      ],
+      "latency_ms": 1560
+    },
+    "critique_node": {
+      "status": "PASS",
+      "flags": [
+        "REC-004C is a critical non-action recommendation \u2014 correctly identified and validated",
+        "REC-004A cost is INR 32,000 \u2014 above auto-approve but below HITL; correctly routed to branch manager",
+        "Compound insight: supplier delay is beneficial \u2014 critique validates this counter-intuitive finding"
+      ],
+      "confidence_overall": 0.95,
+      "latency_ms": 740
+    },
+    "hitl_outcome": {
+      "rec_id": "REC-004A",
+      "status": "APPROVED",
+      "approver": "Branch Manager West",
+      "edit": "None",
+      "final_cost_inr": 32000,
+      "approved_at": "2025-03-24 16:05"
+    },
+    "total_cost_usd": 0.51,
+    "total_latency_seconds": 9.8,
+    "total_tool_calls": 8,
+    "failed_tool_calls": 0
+  },
+  {
+    "scenario_id": "SC-005",
+    "week": "2025-W16",
+    "trigger_question": "SKU-008 demand appears to have spiked 3x nationally \u2014 should we expedite replenishment?",
+    "anomaly_type": "DATA_ANOMALY_FLASH_SALE",
+    "affected_skus": "SKU-008",
+    "affected_regions": "All",
+    "severity": "LOW",
+    "detect_node": {
+      "exceptions_raised": [
+        {
+          "exception_id": "EX-008",
+          "sku": "SKU-008",
+          "region": "All",
+          "weeks_of_cover": 2.2,
+          "status": "OK",
+          "demand_spike_pct": 200,
+          "alert_type": "POTENTIAL_DEMAND_SPIKE",
+          "note": "3x demand recorded \u2014 but cover is 2.2 weeks (normal). Inconsistency flagged."
+        }
+      ],
+      "tool_calls": [
+        "demand_data_tool(SKU-008,All,W16)",
+        "inventory_lookup_tool(SKU-008,All)"
+      ],
+      "latency_ms": 920
+    },
+    "diagnose_node": {
+      "root_cause_hypotheses": [
+        {
+          "hypothesis": "POS_SYSTEM_DATA_ANOMALY",
+          "confidence": 0.91,
+          "evidence": "WE-003: Flash sale on Brand App on Apr 7. POS system recorded 3x demand but inventory position unchanged (2.2 weeks cover). If 3x demand were real, cover would be ~0.7 weeks. Inventory data contradicts demand data \u2014 DATA QUALITY ISSUE.",
+          "rank": 1
+        },
+        {
+          "hypothesis": "GENUINE_DEMAND_SPIKE",
+          "confidence": 0.09,
+          "evidence": "No corroborating evidence \u2014 search trends for SKU-008 normal, no social media spike, no weather/event driver. Ruled out.",
+          "rank": 2
+        }
+      ],
+      "key_insight": "DATA ANOMALY DETECTED: Demand signal and inventory signal are contradictory. Per routing logic \u2014 DATA_ANOMALY route \u2192 flag node, do NOT trigger action recommendation.",
+      "tool_calls": [
+        "weather_event_tool(WE-003)",
+        "shipment_tracker_tool(SKU-008,W16)",
+        "demand_data_tool(SKU-008,All,W14-W16)"
+      ],
+      "latency_ms": 2140
+    },
+    "recommend_node": {
+      "recommendations": [
+        {
+          "rec_id": "REC-005A",
+          "action": "FLAG_DATA_QUALITY_ISSUE",
+          "description": "Do NOT expedite or transfer inventory. Flag POS data anomaly to IT and analytics team for investigation. Suspend W16 demand signal from forecast model.",
+          "urgency": "LOW",
+          "cost_inr": 0,
+          "hitl_required": false,
+          "auto_approve": true
+        }
+      ],
+      "key_note": "CORRECT ACTION IS INACTION \u2014 a threshold-only system would have incorrectly triggered an expedite order costing ~INR 85,000. LangGraph data quality check prevented a false-positive action.",
+      "tool_calls": [
+        "sl_target_lookup_tool(SKU-008)"
+      ],
+      "latency_ms": 640
+    },
+    "critique_node": {
+      "status": "PASS",
+      "flags": [
+        "Data anomaly correctly identified via cross-signal contradiction (demand spike + inventory unchanged)",
+        "No recommendation to act \u2014 correct. False positive prevention is the key value demonstration.",
+        "DEMO POINT: Compare to Demo Step 2 (threshold rule) \u2014 rule would have triggered stockout alert and expedite"
+      ],
+      "confidence_overall": 0.91,
+      "latency_ms": 480
+    },
+    "hitl_outcome": null,
+    "total_cost_usd": 0.38,
+    "total_latency_seconds": 7.2,
+    "total_tool_calls": 7,
+    "failed_tool_calls": 0
+  }
+]

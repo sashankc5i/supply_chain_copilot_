@@ -1,0 +1,11 @@
+sku_id,sku_name,category,target_fill_rate_pct,target_weeks_of_cover_min,target_weeks_of_cover_max,stockout_tolerance_hrs,criticality,expedite_threshold_cover,overstock_threshold_cover,hitl_required_above_inr,auto_approve_below_inr
+SKU-001,PremiumOats 500g,Breakfast Cereals,95,2.0,4.5,48,MEDIUM,1.0,4.5,100000,25000
+SKU-002,InstaNoodles Masala 70g,Instant Food,96,1.5,3.5,24,HIGH,1.2,3.5,100000,25000
+SKU-003,ColdBrew ConcentrateL,Beverages,94,1.5,3.5,24,HIGH,1.2,3.5,100000,25000
+SKU-004,EcoDetergent 1kg,Home Care,92,2.5,5.0,72,MEDIUM,1.0,5.0,100000,25000
+SKU-005,ProteinBarChoc 60g,Health Snacks,93,2.0,4.0,48,MEDIUM,1.0,4.0,100000,25000
+SKU-006,BabyWipes 80pk,Baby Care,97,2.0,4.0,4,CRITICAL,1.5,4.0,100000,25000
+SKU-007,GreenTea 25bags,Beverages,94,1.5,3.5,24,HIGH,1.2,3.5,100000,25000
+SKU-008,WholeMilkUHT 1L,Dairy,98,1.5,3.0,4,CRITICAL,1.5,3.0,100000,25000
+SKU-009,OrganicHoney 500g,Grocery,90,3.0,6.0,72,MEDIUM,1.0,6.0,100000,25000
+SKU-010,SunscreenSPF50 100ml,Personal Care,91,2.0,4.5,48,MEDIUM,1.0,4.5,100000,25000

@@ -1,0 +1,142 @@
+{
+  "schema_id": "LGSM-001",
+  "description": "LangGraph state schema for Supply Chain Copilot \u2014 defines all state fields passed between nodes",
+  "version": "1.0",
+  "fields": {
+    "demand_signals": {
+      "type": "list[DemandSignal]",
+      "description": "Weekly demand data per SKU-store with actual vs forecast, anomaly flags, and drivers",
+      "populated_by": "demand_data_tool",
+      "consumed_by": [
+        "detect_node",
+        "diagnose_node"
+      ]
+    },
+    "inventory_positions": {
+      "type": "list[InventorySnapshot]",
+      "description": "Current stock-on-hand, in-transit, on-order, weeks-of-cover per SKU-store",
+      "populated_by": "inventory_lookup_tool",
+      "consumed_by": [
+        "detect_node",
+        "recommend_node",
+        "critique_node"
+      ]
+    },
+    "active_promotions": {
+      "type": "list[Promotion]",
+      "description": "Active and upcoming promotions with expected uplift and SKU-region scope",
+      "populated_by": "promotion_calendar_tool",
+      "consumed_by": [
+        "diagnose_node"
+      ]
+    },
+    "supplier_status": {
+      "type": "list[SupplierDelayRecord]",
+      "description": "Open supplier delays with severity, affected SKUs, revised ETAs, mitigation options",
+      "populated_by": "supplier_status_tool",
+      "consumed_by": [
+        "diagnose_node",
+        "recommend_node"
+      ]
+    },
+    "weather_events": {
+      "type": "list[WeatherEvent]",
+      "description": "Active and upcoming weather/event signals with historical demand impact by SKU",
+      "populated_by": "weather_event_tool",
+      "consumed_by": [
+        "diagnose_node"
+      ]
+    },
+    "exceptions": {
+      "type": "list[Exception]",
+      "description": "Detected demand/inventory exceptions with severity (CRITICAL/HIGH/MEDIUM/LOW)",
+      "populated_by": "detect_node",
+      "consumed_by": [
+        "router_node",
+        "diagnose_node"
+      ]
+    },
+    "root_cause_hypotheses": {
+      "type": "list[RootCauseHypothesis]",
+      "description": "Ranked hypotheses for each exception with evidence citations and confidence scores",
+      "populated_by": "diagnose_node",
+      "consumed_by": [
+        "recommend_node",
+        "critique_node"
+      ]
+    },
+    "recommendations": {
+      "type": "list[Recommendation]",
+      "description": "Ranked action recommendations with cost, impact, constraints, HITL flag",
+      "populated_by": "recommend_node",
+      "consumed_by": [
+        "critique_node",
+        "escalate_node"
+      ]
+    },
+    "critique_results": {
+      "type": "CritiqueResult",
+      "description": "Evidence check, constraint violation flags, confidence by recommendation",
+      "populated_by": "critique_node",
+      "consumed_by": [
+        "router_node",
+        "escalate_node"
+      ]
+    },
+    "approval_status": {
+      "type": "ApprovalRecord",
+      "description": "HITL approval: pending/approved/rejected/edited; approver ID; timestamp; edit notes",
+      "populated_by": "escalate_node + human_input",
+      "consumed_by": [
+        "execute_node"
+      ]
+    },
+    "what_if_results": {
+      "type": "list[WhatIfScenario]",
+      "description": "Simulation outputs for recommended actions (e.g. transfer X units \u2192 service level impact)",
+      "populated_by": "what_if_simulation_tool",
+      "consumed_by": [
+        "recommend_node",
+        "critique_node"
+      ]
+    },
+    "trace_metadata": {
+      "type": "TraceMetadata",
+      "description": "Tool calls made, latency, tokens, cost, node path taken, failed calls",
+      "populated_by": "all nodes",
+      "consumed_by": [
+        "observability_dashboard"
+      ]
+    }
+  },
+  "routing_logic": {
+    "detect_node": {
+      "output_routes": {
+        "CRITICAL": "diagnose_node (immediate) \u2192 recommend_node \u2192 critique_node \u2192 escalate_node (HITL mandatory)",
+        "HIGH": "diagnose_node \u2192 recommend_node \u2192 critique_node \u2192 escalate_node (HITL if cost > INR 100K)",
+        "MEDIUM": "diagnose_node \u2192 recommend_node \u2192 critique_node \u2192 auto_approve if cost < INR 25K",
+        "LOW": "summary_node (no diagnosis or recommendation)",
+        "DATA_ANOMALY": "flag_node (return to monitoring; do not trigger action)"
+      }
+    },
+    "critique_node": {
+      "output_routes": {
+        "PASS": "proceed to escalate/execute",
+        "FAIL_NO_EVIDENCE": "return to diagnose_node for additional evidence retrieval",
+        "FAIL_CONSTRAINT_VIOLATION": "return to recommend_node for alternative recommendation",
+        "FAIL_DATA_QUALITY": "flag to human; suspend recommendation"
+      }
+    }
+  },
+  "tools_available": [
+    "demand_data_tool",
+    "inventory_lookup_tool",
+    "promotion_calendar_tool",
+    "supplier_status_tool",
+    "weather_event_tool",
+    "shipment_tracker_tool",
+    "what_if_simulation_tool",
+    "sl_target_lookup_tool",
+    "competitor_intel_tool"
+  ]
+}
