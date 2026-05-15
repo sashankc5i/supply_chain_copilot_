@@ -17,6 +17,7 @@ streamlit>=1.30
 pydantic>=2.0
 python-dotenv>=1.0
 
-# Evaluation / notebooks
+# Evaluation / notebooks / tests
 jupyter>=1.0
 matplotlib>=3.7
+pytest>=8.0

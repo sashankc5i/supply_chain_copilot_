@@ -114,102 +114,49 @@ def _summarize_evidence(evidence: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Smoke test: detect + manual tool calls (preview of retrieve_evidence in task 4)
-# + diagnose, end-to-end against real Azure OpenAI.
+# Smoke test: detect -> retrieve_evidence -> diagnose, end-to-end.
+# Uses the real retrieve_evidence node (task 4), not inlined tool calls.
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import time
 
     from src.graph.nodes.detect import detect as detect_node
-    from src.tools.demand_lookup import demand_lookup
-    from src.tools.promo_calendar import promo_calendar
-    from src.tools.supplier_delays import supplier_delays
-    from src.tools.weather_events import weather_events
+    from src.graph.nodes.retrieve_evidence import retrieve_evidence
 
-    def _call(fn, **kwargs):
-        return fn.invoke(kwargs) if hasattr(fn, "invoke") else fn(**kwargs)
-
-    def _avg(xs):
-        return sum(xs) / len(xs) if xs else 0.0
-
-    def run_scenario(label: str, week_start: str, target_sku: str | None = None) -> None:
-        print(f"\n{'=' * 72}")
-        print(f"SCENARIO  {label}")
-        print(f"{'=' * 72}")
-
+    def run_scenario(label: str, week_start: str) -> None:
+        print(f"\n{'=' * 72}\nSCENARIO  {label}\n{'=' * 72}")
         state: dict = {"run_id": f"diagnose-{label}", "week_start": week_start}
+
+        t_d = time.perf_counter()
         state.update(detect_node(state))
+        t_d = (time.perf_counter() - t_d) * 1000
 
         high = [s for s in state["demand_signals"] if s["severity"] == "HIGH"]
-        if target_sku:
-            high = [s for s in high if s["sku_id"] == target_sku] or high
         if not high:
-            print("  no HIGH signals -- skipping")
+            print(f"detect: {t_d:.0f}ms  no HIGH signals -- skipping")
             return
 
         focal = max(high, key=lambda s: abs(s["zscore"]))
-        print(f"focal:    {focal['sku_id']} @ {focal['store_id']} ({focal['region']})  "
-              f"z={focal['zscore']:+.2f}  type={focal['anomaly_type']}  sev={focal['severity']}")
+        print(f"detect:           {t_d:>6.0f} ms   focal={focal['sku_id']} @ "
+              f"{focal['store_id']} ({focal['region']})  z={focal['zscore']:+.2f}  "
+              f"type={focal['anomaly_type']}")
 
-        # Mimic what retrieve_evidence will do: 4 tools in parallel, structured dict.
-        promo = _call(promo_calendar,
-                      sku_id=focal["sku_id"], region=focal["region"],
-                      week_start=focal["week_start"])
-        weather = _call(weather_events,
-                        region=focal["region"], week_start=focal["week_start"])
-        supplier = _call(supplier_delays, sku_id=focal["sku_id"])
-        demand = _call(demand_lookup,
-                       sku_id=focal["sku_id"], store_id=focal["store_id"],
-                       weeks=8, anchor_week=focal["week_start"])
+        t_r = time.perf_counter()
+        state.update(retrieve_evidence(state))
+        t_r = (time.perf_counter() - t_r) * 1000
+        ev = state.get("evidence", {})
+        print(f"retrieve_evidence:{t_r:>6.0f} ms   sources={list(ev.keys())}")
 
-        evidence = {
-            "promo": {
-                "source": "promotion_calendar.csv",
-                "data": promo,
-                "confidence": 0.95 if promo else 0.50,
-                "estimated_impact_pct": sum(p["demand_lift_pct"] for p in promo),
-            },
-            "weather": {
-                "source": "weather_events.csv",
-                "data": weather,
-                "confidence": _avg([e["confidence"] for e in weather]) if weather else 0.50,
-                "estimated_impact_pct": sum(e["demand_impact_pct"] for e in weather),
-            },
-            "supplier": {
-                "source": "supplier_data.csv",
-                "data": supplier,
-                "confidence": 0.95,
-                "estimated_impact_pct": -5.0 * sum(
-                    s["delay_days"] for s in supplier if s["delay_flag"]
-                ),
-            },
-            "demand": {
-                "source": "demand_history.csv",
-                "data": demand,
-                "confidence": 1.00,
-                "estimated_impact_pct": demand.get("latest_wow_delta_pct", 0.0),
-            },
-        }
-        state["evidence"] = evidence
-
-        print("evidence:")
-        for k, v in evidence.items():
-            n = len(v["data"]) if isinstance(v["data"], list) else "dict"
-            print(f"  {k:8} records={n!s:>4}  confidence={v['confidence']:.2f}  "
-                  f"impact={v['estimated_impact_pct']:+.1f}%")
-
-        t0 = time.perf_counter()
+        t_dg = time.perf_counter()
         out = diagnose(state)
-        elapsed = time.perf_counter() - t0
+        t_dg = (time.perf_counter() - t_dg) * 1000
 
         hypos = out["root_cause_hypotheses"]
-        print(f"\ndiagnose latency: {elapsed:.2f}s   hypotheses: {len(hypos)}")
+        print(f"diagnose:         {t_dg:>6.0f} ms   hypotheses={len(hypos)}\n")
         for i, h in enumerate(hypos, 1):
-            print(f"\n  [{i}] cause={h['cause_type']:18}  confidence={h['confidence']:.2f}")
-            print(f"      sources: {h['evidence_sources']}")
-            print(f"      explanation: {h['explanation']}")
+            print(f"  [{i}] {h['cause_type']:18}  conf={h['confidence']:.2f}  "
+                  f"sources={h['evidence_sources']}")
+            print(f"      {h['explanation']}")
 
-    run_scenario("Demo-1 SKU-1042 / West / Wk87 (promo + heatwave spike)",
-                 "2026-01-12", target_sku="SKU-1042")
-    run_scenario("Demo-2 SKU-0217 / South / Wk89 (supplier delay)",
-                 "2026-01-26", target_sku="SKU-0217")
+    run_scenario("Demo-1 SKU-1042 / West / Wk87 (promo + heatwave spike)", "2026-01-12")
+    run_scenario("Demo-2 SKU-0217 / South / Wk89 (supplier delay)",        "2026-01-26")

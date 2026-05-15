@@ -21,8 +21,9 @@ if __package__ in (None, ""):
 
 from langgraph.graph import END, START, StateGraph
 
-from src.graph.nodes.detect import detect          # real implementation (Phase 2)
-from src.graph.nodes.diagnose import diagnose      # real implementation (Phase 2)
+from src.graph.nodes.detect import detect                      # Phase 2
+from src.graph.nodes.diagnose import diagnose                  # Phase 2
+from src.graph.nodes.retrieve_evidence import retrieve_evidence  # Phase 2
 from src.graph.state import SupplyChainState
 
 
@@ -30,10 +31,6 @@ from src.graph.state import SupplyChainState
 # Placeholder nodes -- swapped for real ones in src/graph/nodes/* (Phase 2-3).
 # Each node returns a partial state dict that LangGraph merges back.
 # ---------------------------------------------------------------------------
-
-
-def retrieve_evidence(state: SupplyChainState) -> dict:
-    return {"evidence": state.get("evidence", {})}
 
 
 def recommend(state: SupplyChainState) -> dict:
