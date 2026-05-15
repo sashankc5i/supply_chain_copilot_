@@ -1,7 +1,9 @@
 """demand_lookup tool -- weekly demand series + WoW delta + z-score.
 
-Day 1 stub: returns hardcoded sample for SKU-1042 / ST-001. Phase 2 swaps in
-real CSV reads against `demand_history.csv` via `src.data.loaders.load_demand`.
+Real implementation: reads `demand_history.csv` via the cached
+`src.data.loaders.load_demand()` and slices the trailing N weeks for the
+specified (sku_id, store_id). Z-score and WoW delta are pre-computed at
+data-generation time, so this tool is a pure point lookup.
 """
 from __future__ import annotations
 
@@ -10,11 +12,15 @@ if __package__ in (None, ""):
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from langchain_core.tools import tool
+import pandas as pd
+
+from src.data.loaders import load_demand
+from src.tools._compat import tool
 
 
 @tool
-def demand_lookup(sku_id: str, store_id: str, weeks: int = 8) -> dict:
+def demand_lookup(sku_id: str, store_id: str, weeks: int = 8,
+                  anchor_week: str | None = None) -> dict:
     """Return the trailing `weeks` of weekly demand for a SKU at a store.
 
     Output schema:
@@ -32,22 +38,42 @@ def demand_lookup(sku_id: str, store_id: str, weeks: int = 8) -> dict:
         sku_id: e.g. "SKU-1042".
         store_id: e.g. "ST-007".
         weeks: trailing window length. Default 8.
+        anchor_week: optional ISO date "YYYY-MM-DD". If provided, returns
+            the `weeks` rows ending at this date (inclusive) -- use this to
+            get context AROUND an anomaly week, not the latest data.
+            Default: latest week available for that (sku, store).
     """
-    sample_series = [
-        {"week_start": "2026-03-23", "units_sold":  95, "wow_delta_pct":  -2.1, "zscore": -0.2},
-        {"week_start": "2026-03-30", "units_sold": 102, "wow_delta_pct":   7.4, "zscore":  0.3},
-        {"week_start": "2026-04-06", "units_sold":  98, "wow_delta_pct":  -3.9, "zscore": -0.1},
-        {"week_start": "2026-04-13", "units_sold": 110, "wow_delta_pct":  12.2, "zscore":  0.6},
-        {"week_start": "2026-04-20", "units_sold": 105, "wow_delta_pct":  -4.5, "zscore":  0.2},
-        {"week_start": "2026-04-27", "units_sold": 100, "wow_delta_pct":  -4.8, "zscore":  0.0},
-        {"week_start": "2026-05-04", "units_sold": 115, "wow_delta_pct":  15.0, "zscore":  0.9},
-        {"week_start": "2026-05-11", "units_sold": 253, "wow_delta_pct": 120.0, "zscore":  3.4},
-    ]
+    demand = load_demand()
+    df = demand[(demand["sku_id"] == sku_id) & (demand["store_id"] == store_id)]
+
+    if anchor_week:
+        anchor = pd.to_datetime(anchor_week).normalize()
+        df = df[df["week_start"] <= anchor]
+
+    df = df.sort_values("week_start").tail(weeks)
+
+    if df.empty:
+        return {
+            "sku_id": sku_id, "store_id": store_id,
+            "weeks_returned": 0, "series": [],
+            "latest_zscore": 0.0, "latest_wow_delta_pct": 0.0,
+        }
+
+    series = []
+    for r in df.itertuples(index=False):
+        ws = r.week_start.strftime("%Y-%m-%d") if hasattr(r.week_start, "strftime") else str(r.week_start)
+        series.append({
+            "week_start": ws,
+            "units_sold": int(r.units_sold),
+            "wow_delta_pct": round(float(r.wow_delta_pct), 2),
+            "zscore": round(float(r.zscore), 3),
+        })
+
     return {
         "sku_id": sku_id,
         "store_id": store_id,
-        "weeks_returned": min(weeks, len(sample_series)),
-        "series": sample_series[-weeks:],
-        "latest_zscore": sample_series[-1]["zscore"],
-        "latest_wow_delta_pct": sample_series[-1]["wow_delta_pct"],
+        "weeks_returned": len(series),
+        "series": series,
+        "latest_zscore": series[-1]["zscore"],
+        "latest_wow_delta_pct": series[-1]["wow_delta_pct"],
     }

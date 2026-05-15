@@ -88,9 +88,9 @@ CritiqueResult = {
 All tools are `@tool`-decorated functions in [src/tools/](src/tools/). Each
 docstring carries the binding I/O schema. Summary table:
 
-| Tool               | Signature                                                                  | Returns      |
-|--------------------|-----------------------------------------------------------------------------|--------------|
-| `demand_lookup`    | `(sku_id, store_id, weeks=8)`                                              | `dict`       |
+| Tool               | Signature                                                                                                | Returns      |
+|--------------------|-----------------------------------------------------------------------------------------------------------|--------------|
+| `demand_lookup`    | `(sku_id, store_id, weeks=8, anchor_week: Optional[str] = None)` — `anchor_week` is an ISO "YYYY-MM-DD". When given, returns the `weeks` rows ending at this date (inclusive); used by `retrieve_evidence` to pull context AROUND the anomaly week, not the latest data. | `dict` |
 | `inventory_lookup` | `(sku_id, location_id)`                                                    | `dict`       |
 | `promo_calendar`   | `(sku_id, region, week_start)` — `week_start` is ISO `"YYYY-MM-DD"`        | `list[dict]` |
 | `weather_events`   | `(region, week_start)`                                                     | `list[dict]` |

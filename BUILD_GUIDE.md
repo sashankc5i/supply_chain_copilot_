@@ -718,6 +718,24 @@ what-if panel is cuttable if it's wobbly.
 - `eval_results.md` — final numbers in a results table, plus 1-2 paragraphs
   on what they mean.
 
+#### [Lead/P2] Star-schema documentation (polish)
+
+**What it is:** formalize the implicit dimensional structure already present
+in our data. We have a 2-dim mini-star (DimSKU / DimLocation around FactDemand
++ FactInventory) but never documented it.
+
+**Why it matters:** evaluators with a data-engineering background expect to
+see dimensional thinking. A small `scripts/generate_dim_date.py` plus an ER
+diagram in `ARCHITECTURE.md` answers the question without requiring a real
+warehouse migration.
+
+**Files created:**
+- `scripts/generate_dim_date.py` — emits `data/raw/dim_date.csv` with one row
+  per week (date_id, year, quarter, month, iso_week, week_start, is_holiday).
+- `ARCHITECTURE.md` — new "Data model" section with the star-schema ER
+  diagram (ASCII or Mermaid), fact/dim role table, and a note on why we
+  stop short of FK constraints / SCD2 for this build.
+
 ### End-of-Phase-5 verification
 
 A fresh clone smoke test passes:
