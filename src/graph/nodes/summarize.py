@@ -10,8 +10,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.graph.llm import get_llm
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 
 
+@log_node("summarize")
 def summarize(state: SupplyChainState) -> dict:
     """Produce a brief operator-facing summary; no recommendations or HITL."""
     signals = state.get("demand_signals") or []

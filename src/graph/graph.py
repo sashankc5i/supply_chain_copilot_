@@ -13,7 +13,9 @@ if __package__ in (None, ""):
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from langgraph.checkpoint.memory import MemorySaver
+from pathlib import Path
+
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 
 from src.graph.nodes.critique import critique
@@ -24,6 +26,10 @@ from src.graph.nodes.recommend import recommend
 from src.graph.nodes.retrieve_evidence import retrieve_evidence
 from src.graph.nodes.summarize import summarize
 from src.graph.state import SupplyChainState
+
+# Shared SQLite checkpointer — written to data/runtime/checkpoints.db so
+# both the Streamlit process and the FastAPI process read the same state.
+_DB_PATH = str(Path(__file__).resolve().parents[2] / "data" / "runtime" / "checkpoints.db")
 
 
 def route_after_detect(state: SupplyChainState) -> str:
@@ -88,7 +94,11 @@ def build_graph(*, checkpointer=None):
     return g.compile()
 
 
-_checkpointer = MemorySaver()
+import sqlite3 as _sqlite3
+_db_dir = Path(_DB_PATH).parent
+_db_dir.mkdir(parents=True, exist_ok=True)
+_conn = _sqlite3.connect(_DB_PATH, check_same_thread=False)
+_checkpointer = SqliteSaver(_conn)
 app = build_graph(checkpointer=_checkpointer)
 
 

@@ -7,6 +7,7 @@ Faker>=22.0
 # LLM: Azure OpenAI (gpt-4o-mini) via langchain-openai.
 # LangSmith intentionally omitted -- no remote tracing in this build.
 langgraph>=0.2
+langgraph-checkpoint-sqlite>=2.0
 langchain>=0.2
 langchain-openai>=0.1
 

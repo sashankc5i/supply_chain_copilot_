@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from src.graph.llm import get_llm
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 
 ActionType = Literal[
     "transfer_inventory", "expedite_order", "reduce_promo", "wait_and_watch"
@@ -39,6 +40,7 @@ class _RecommendOutput(BaseModel):
     recommendations: list[_Recommendation]
 
 
+@log_node("recommend")
 def recommend(state: SupplyChainState) -> dict:
     """Generate ranked recommendations for the focal HIGH-severity signal."""
     updates: dict = {}

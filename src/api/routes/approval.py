@@ -1,4 +1,10 @@
-"""POST /approval/{run_id} -- resume LangGraph after HITL decision."""
+"""POST /approval/{run_id} -- resume LangGraph after HITL decision.
+GET  /run/{run_id}/status -- inspect whether a run is paused.
+
+NOTE: The Streamlit dashboard resumes the graph directly (in-process) to avoid
+cross-process state-sharing issues.  These endpoints are kept for external
+API use and testing via the Swagger UI at /docs.
+"""
 from __future__ import annotations
 
 from typing import Any, Literal, Optional
@@ -94,4 +100,39 @@ def post_approval(run_id: str, body: ApprovalRequest) -> ApprovalResponse:
         status="resumed",
         next_node=None,
         message=f"Graph resumed; approval_status={approval_status}.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Debug / status endpoint
+# ---------------------------------------------------------------------------
+
+class RunStatus(BaseModel):
+    run_id: str
+    is_paused: bool
+    pending_tasks: list[str]
+    approval_status: Optional[str] = None
+    message: str = ""
+
+
+@router.get("/run/{run_id}/status", response_model=RunStatus)
+def get_run_status(run_id: str) -> RunStatus:
+    """Return whether a graph run is currently paused at an interrupt."""
+    config = {"configurable": {"thread_id": run_id}}
+    snap = graph_app.get_state(config)
+    if not snap:
+        return RunStatus(
+            run_id=run_id,
+            is_paused=False,
+            pending_tasks=[],
+            message="No checkpoint found for this run_id.",
+        )
+    tasks = [str(t) for t in (snap.tasks or [])]
+    approval = (snap.values or {}).get("approval_status")
+    return RunStatus(
+        run_id=run_id,
+        is_paused=bool(tasks),
+        pending_tasks=tasks,
+        approval_status=approval,
+        message="Paused — awaiting HITL resume." if tasks else "Run completed.",
     )

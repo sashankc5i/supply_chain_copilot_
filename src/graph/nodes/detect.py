@@ -38,6 +38,7 @@ import pandas as pd
 
 from src.data.loaders import ANCHOR_DATE, load_demand, load_inventory
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 
 TRAILING_WEEKS = 8
 Z_THRESHOLD = 2.0
@@ -45,6 +46,7 @@ HIGH_DOH_MAX = 5.0
 MEDIUM_DOH_MAX = 10.0
 
 
+@log_node("detect")
 def detect(state: SupplyChainState) -> dict:
     """Run anomaly detection on the target week and return state updates."""
     week_str = state.get("week_start") or ANCHOR_DATE.isoformat()

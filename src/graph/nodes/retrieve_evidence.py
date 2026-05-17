@@ -32,12 +32,14 @@ if __package__ in (None, ""):
 from concurrent.futures import ThreadPoolExecutor
 
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 from src.tools.demand_lookup import demand_lookup
 from src.tools.promo_calendar import promo_calendar
 from src.tools.supplier_delays import supplier_delays
 from src.tools.weather_events import weather_events
 
 
+@log_node("retrieve_evidence")
 def retrieve_evidence(state: SupplyChainState) -> dict:
     """Gather promo/weather/supplier/demand evidence for the strongest HIGH signal."""
     signals = state.get("demand_signals") or []

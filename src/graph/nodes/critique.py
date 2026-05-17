@@ -14,6 +14,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 from src.tools.inventory_lookup import inventory_lookup
 from src.tools.supplier_delays import supplier_delays
 
@@ -24,6 +25,7 @@ def _call_tool(fn, **kwargs):
 BUDGET_CAP_USD = 5000.0
 
 
+@log_node("critique")
 def critique(state: SupplyChainState) -> dict:
     """Check top recommendation against business constraints."""
     recs = state.get("recommendations") or []

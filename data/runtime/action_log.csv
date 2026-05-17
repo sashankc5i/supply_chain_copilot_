@@ -1,1 +1,2 @@
 run_id,sku_id,action_type,recommendation,approval_status,approver,rejection_reason,timestamp
+st-302a8d994adb,SKU-1042,reduce_promo,"{""action_type"": ""reduce_promo"", ""params"": {""promo_id"": ""PROMO-DEMO-001"", ""discount_reduction_pct"": 20.0}, ""cost_usd"": 0.0, ""confidence"": 0.95, ""doh_improvement_days"": 7.0}",approved,operator@command-center,Operator approved,2026-05-17T03:41:00.829041+00:00

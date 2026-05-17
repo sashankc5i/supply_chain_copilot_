@@ -31,6 +31,7 @@ st.set_page_config(
 from dashboard.components.alert_card import render_alert_card
 from dashboard.components.evidence_panel import render_evidence_panel
 from dashboard.components.recommendation_table import render_recommendation_table
+from dashboard.components.run_breakdown import render_run_breakdown
 from src.api.routes.alerts import set_latest_alerts
 from src.graph.graph import app as graph_app
 
@@ -124,7 +125,7 @@ if run:
 # Main
 # ---------------------------------------------------------------------------
 st.title("📦 Supply Chain Command Center")
-st.caption("LangGraph Copilot · Phase 3 · gpt-4o-mini")
+st.caption("LangGraph Copilot · Phase 4 · gpt-4o-mini")
 
 if (
     st.session_state.state is not None
@@ -223,7 +224,15 @@ with right:
             )
 
         if state.get("approval_status") and state["approval_status"] != "n/a":
-            st.success(f"Approval status: **{state['approval_status']}**")
+            status = state["approval_status"]
+            if status == "approved":
+                st.success(f"✅ Action **{status}** — logged to action_log.csv.")
+            elif status == "rejected":
+                st.warning(f"🚫 Action **{status}** — logged to action_log.csv.")
+            elif status == "edited":
+                st.info(f"✏️ Action **{status}** — re-critiqued with new params.")
+            else:
+                st.info(f"Approval status: **{status}**")
 
 with st.expander("Pipeline metadata"):
     st.json({
@@ -235,3 +244,10 @@ with st.expander("Pipeline metadata"):
         "n_signals": len(signals),
         "timings_ms": timings,
     })
+
+st.divider()
+with st.expander("🔍 Run breakdown (node trace)", expanded=False):
+    if run_id:
+        render_run_breakdown(run_id)
+    else:
+        st.info("Run a pipeline first to see the node trace.")

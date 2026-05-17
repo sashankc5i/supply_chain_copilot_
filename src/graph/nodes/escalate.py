@@ -10,8 +10,10 @@ from langgraph.types import interrupt
 
 from src.api.action_log import append_action_log
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 
 
+@log_node("escalate")
 def escalate(state: SupplyChainState) -> dict:
     """Pause for human approval; resume with approve/reject/edit decision."""
     critique = state.get("critique_result") or {}
