@@ -29,7 +29,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from faker import Faker
+from faker import Faker  # type: ignore[import-not-found]
 
 SEED = 42
 np.random.seed(SEED)

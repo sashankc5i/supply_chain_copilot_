@@ -15,8 +15,8 @@ if __package__ in (None, ""):
 
 from pathlib import Path
 
-from langgraph.checkpoint.sqlite import SqliteSaver
-from langgraph.graph import END, START, StateGraph
+from langgraph.checkpoint.sqlite import SqliteSaver  # type: ignore[reportMissingImports]
+from langgraph.graph import END, START, StateGraph  # type: ignore[reportMissingImports]
 
 from src.graph.nodes.critique import critique
 from src.graph.nodes.detect import detect

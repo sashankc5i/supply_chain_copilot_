@@ -1,0 +1,130 @@
+You are a principal AI systems architect and technical storyteller. Your job is to deeply analyze and explain this entire project so a new engineer can understand it quickly and also visualize how everything works end-to-end.
+
+Project Name:
+Supply Chain Command Center Copilot
+
+Primary Objective:
+This project detects supply-chain demand anomalies, gathers evidence from multiple tools, uses LLM reasoning to diagnose root causes, proposes ranked actions, validates those actions, routes risky actions to human approval (HITL), and provides dashboard + API interfaces with observability and evaluation support.
+
+Tech Stack:
+- Python 3.12+
+- LangGraph (stateful agent workflow)
+- FastAPI (API surface)
+- Streamlit (dashboard UI)
+- pandas/numpy (data processing)
+- Azure OpenAI gpt-4o-mini via langchain-openai (temperature=0)
+- SQLite checkpointer via langgraph-checkpoint-sqlite
+- CSV-based data storage (raw, processed, runtime, reference)
+
+Folder Structure (important modules):
+- src/graph/
+  - graph.py: graph topology + routers + SQLite checkpointer
+  - state.py: TypedDict schema and shared contracts
+  - llm.py: model setup
+  - nodes/: detect, retrieve_evidence, diagnose, recommend, critique, escalate, summarize
+  - prompts/: LLM prompts for diagnose/recommend
+- src/tools/
+  - demand_lookup.py, inventory_lookup.py, promo_calendar.py, weather_events.py, supplier_delays.py, what_if_sim.py
+- src/api/
+  - main.py: FastAPI app + routers + CORS + /health
+  - routes/alerts.py, routes/approval.py, routes/whatif.py
+  - action_log.py: approval/action audit logging
+- dashboard/
+  - app.py: main Streamlit app
+  - components/: alert_card.py, evidence_panel.py, recommendation_table.py, run_breakdown.py
+  - pages/: what_if.py, hitl_approval.py
+- eval/
+  - test_cases.json, rubric.py, run_evals.py
+- data/
+  - raw/, processed/, runtime/, reference/
+- scripts/
+  - generate_data.py, smoke_test_tools.py
+
+Graph Topology (actual execution):
+START -> detect -> (retrieve_evidence OR summarize)
+retrieve_evidence -> diagnose -> recommend -> critique
+critique -> (escalate OR recommend retry once OR summarize)
+escalate -> (critique if edited, else END)
+summarize -> END
+
+State Model Highlights (SupplyChainState):
+- demand_signals
+- inventory_positions
+- evidence
+- root_cause_hypotheses
+- recommendations
+- critique_result
+- approval_status
+- retry_count
+- exceptions
+- run_id
+
+Critical Runtime Behavior:
+1) Detect node finds anomalies and severity from demand + inventory context.
+2) High-severity path enters evidence retrieval and LLM reasoning path.
+3) Critique node can reject and force one recommendation retry.
+4) Escalate node uses LangGraph interrupt() for HITL pause.
+5) Human decisions are resume payloads: approve / reject / edit.
+6) Dashboard approval now resumes the graph in-process using:
+   graph_app.invoke(Command(resume=payload), config)
+   This avoids cross-process 404 issues.
+7) SQLite checkpointer file is used at data/runtime/checkpoints.db.
+8) Node timings are written to data/runtime/node_latency.csv.
+
+API Endpoints:
+- GET /health
+- GET /alerts
+- POST /whatif
+- POST /approval/{run_id}
+- GET /run/{run_id}/status
+
+Dashboard Flow:
+- User selects scenario/week and runs pipeline.
+- Alert cards show anomalies.
+- Evidence panel shows supporting signals.
+- Recommendation table shows top actions and confidence/cost.
+- HITL buttons: Approve / Reject / Edit & re-critique.
+- Run breakdown component visualizes per-node latency.
+- What-if page calls /whatif and visualizes baseline vs projected metrics.
+
+Evaluation Layer:
+- eval/run_evals.py executes multiple scenarios.
+- Automatically resumes HITL for batch evaluation.
+- Computes precision, recall, F1, average recommendation score, average latency.
+- Uses eval/rubric.py with LLM judge + heuristic fallback.
+
+Your Tasks (strictly follow):
+1) Give a complete architecture explanation in plain language first.
+2) Then provide a system-level decomposition by layer:
+   - Data layer
+   - Tool layer
+   - Graph/orchestration layer
+   - LLM reasoning layer
+   - API layer
+   - UI layer
+   - Evaluation/observability layer
+3) Provide 3 diagrams in Mermaid:
+   - Component architecture diagram
+   - Sequence diagram for one full HIGH-severity run with HITL edit path
+   - Data flow diagram from CSV inputs to final action log
+4) Explain every graph node with:
+   - Inputs consumed from state
+   - Outputs produced into state
+   - Failure modes
+   - Why this node exists
+5) Explain routing logic as deterministic pseudocode.
+6) Explain HITL mechanics and why in-process resume is safer in this setup.
+7) Summarize API contracts with request/response examples.
+8) Explain observability (node latency log, action log, eval artifacts).
+9) List top 10 risks/limitations and concrete mitigation ideas.
+10) Provide a "new engineer onboarding path" with step-by-step run commands.
+11) End with a concise "mental model" paragraph that captures the whole system.
+
+Output Format Requirements:
+- Sectioned markdown with clear headings.
+- Use tables where useful.
+- Use precise, implementation-aware language.
+- Do not give generic advice; tie explanations to this project design.
+- Keep assumptions explicit and call out any uncertainty.
+
+If you need to infer anything, label it clearly as "inferred".

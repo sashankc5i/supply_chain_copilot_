@@ -11,8 +11,8 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI  # type: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware  # type: ignore[reportMissingImports]
 
 load_dotenv()
 
