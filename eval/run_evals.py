@@ -30,6 +30,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.types import Command
 
 from src.graph.graph import build_graph
 from eval.rubric import score_recommendation
@@ -73,7 +74,11 @@ def _invoke_graph(test_case: dict) -> tuple[dict, float]:
     snap = app.get_state(config)
     if snap and snap.tasks:
         state = app.invoke(
-            {"decision": "approve", "reason": "eval-auto-approve"},
+            Command(resume={
+                "decision": "approve",
+                "reason": "eval-auto-approve",
+                "approver": "eval-harness",
+            }),
             config=config,
         )
 
@@ -209,10 +214,10 @@ def run_evals() -> dict:
         json.dump(summary, f, indent=2, default=str)
 
     print("\n=== EVAL RESULTS ===")
-    print(f"  Precision : {precision:.3f}  (target >=0.85 → {'PASS' if precision >= 0.85 else 'FAIL'})")
-    print(f"  Recall    : {recall:.3f}  (target >=0.90 → {'PASS' if recall >= 0.90 else 'FAIL'})")
-    print(f"  Rec score : {avg_rec_score:.2f}/5  (target >=3.5 → {'PASS' if avg_rec_score >= 3.5 else 'FAIL'})")
-    print(f"  Latency   : {avg_latency:.1f}s avg  (target <45s → {'PASS' if avg_latency < 45.0 else 'FAIL'})")
+    print(f"  Precision : {precision:.3f}  (target >=0.85 -> {'PASS' if precision >= 0.85 else 'FAIL'})")
+    print(f"  Recall    : {recall:.3f}  (target >=0.90 -> {'PASS' if recall >= 0.90 else 'FAIL'})")
+    print(f"  Rec score : {avg_rec_score:.2f}/5  (target >=3.5 -> {'PASS' if avg_rec_score >= 3.5 else 'FAIL'})")
+    print(f"  Latency   : {avg_latency:.1f}s avg  (target <45s -> {'PASS' if avg_latency < 45.0 else 'FAIL'})")
     print(f"\n  Results written to: {_RESULTS_PATH}")
 
     return summary

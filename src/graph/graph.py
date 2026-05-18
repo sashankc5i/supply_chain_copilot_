@@ -26,6 +26,7 @@ from src.graph.nodes.recommend import recommend
 from src.graph.nodes.retrieve_evidence import retrieve_evidence
 from src.graph.nodes.summarize import summarize
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_routing
 
 # Shared SQLite checkpointer — written to data/runtime/checkpoints.db so
 # both the Streamlit process and the FastAPI process read the same state.
@@ -35,26 +36,35 @@ _DB_PATH = str(Path(__file__).resolve().parents[2] / "data" / "runtime" / "check
 def route_after_detect(state: SupplyChainState) -> str:
     signals = state.get("demand_signals", [])
     if any(s.get("severity") == "HIGH" for s in signals):
-        return "retrieve_evidence"
-    if signals and all(s.get("anomaly_type") == "flat_line" for s in signals):
-        return "summarize"
-    return "summarize"
+        decision = "retrieve_evidence"
+    elif signals and all(s.get("anomaly_type") == "flat_line" for s in signals):
+        decision = "summarize"
+    else:
+        decision = "summarize"
+    log_routing(state, "detect", decision)
+    return decision
 
 
 def route_after_critique(state: SupplyChainState) -> str:
     verdict = (state.get("critique_result") or {}).get("verdict")
     retry = state.get("retry_count", 0)
     if verdict == "approved":
-        return "escalate"
-    if verdict == "rejected" and retry < 1:
-        return "recommend"
-    return "summarize"
+        decision = "escalate"
+    elif verdict == "rejected" and retry < 1:
+        decision = "recommend"
+    else:
+        decision = "summarize"
+    log_routing(state, "critique", decision)
+    return decision
 
 
 def route_after_escalate(state: SupplyChainState) -> str:
     if state.get("approval_status") == "edited":
-        return "critique"
-    return END
+        decision = "critique"
+    else:
+        decision = END
+    log_routing(state, "escalate", str(decision))
+    return decision
 
 
 def build_graph(*, checkpointer=None):

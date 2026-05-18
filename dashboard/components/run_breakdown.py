@@ -75,16 +75,21 @@ def render_run_breakdown(run_id: str) -> None:
         node = row.get("node_name", "?")
         lat = float(row.get("latency_ms", 0))
         out_keys = str(row.get("output_keys", ""))
-        color = _NODE_COLOR.get(node, "#aaaaaa")
-        pct = min(lat / max(total_ms, 1) * 100, 100)
+        routing = str(row.get("routing_decision", "") or "").strip()
+        base_node = node.replace("route_after_", "") if node.startswith("route_after_") else node
+        color = _NODE_COLOR.get(base_node, "#888888")
+        pct = min(lat / max(total_ms, 1) * 100, 100) if lat > 0 else 0
 
         with st.container():
             col_label, col_bar, col_ms = st.columns([2, 5, 1])
             with col_label:
+                label = node if not node.startswith("route_after_") else f"↳ route ({base_node})"
                 st.markdown(
-                    f"<span style='color:{color};font-weight:600'>{node}</span>",
+                    f"<span style='color:{color};font-weight:600'>{label}</span>",
                     unsafe_allow_html=True,
                 )
+                if routing:
+                    st.caption(f"→ **{routing}**")
             with col_bar:
                 bar_html = (
                     f"<div style='background:#e8e8e8;border-radius:4px;height:14px;margin-top:6px'>"

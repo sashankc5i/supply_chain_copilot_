@@ -32,7 +32,7 @@ def summarize(state: SupplyChainState) -> dict:
         exceptions.append("No anomalies detected for the selected week.")
         return {"exceptions": exceptions, "approval_status": "n/a"}
 
-    focal = max(signals, key=lambda s: abs(s.get("zscore", 0.0)))
+    focal = _focal_signal(signals, state)
     flat_line = any(s.get("anomaly_type") == "flat_line" for s in signals)
 
     try:
@@ -60,3 +60,13 @@ def summarize(state: SupplyChainState) -> dict:
 
     exceptions.append(summary.strip())
     return {"exceptions": exceptions, "approval_status": "n/a"}
+
+
+def _focal_signal(signals: list[dict], state: SupplyChainState) -> dict:
+    """Prefer caller-provided sku_id, else highest |z-score|."""
+    target_sku = state.get("sku_id")
+    if target_sku:
+        sku_hits = [s for s in signals if s.get("sku_id") == target_sku]
+        if sku_hits:
+            return max(sku_hits, key=lambda s: abs(s.get("zscore", 0.0)))
+    return max(signals, key=lambda s: abs(s.get("zscore", 0.0)))

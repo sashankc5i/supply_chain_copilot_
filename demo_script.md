@@ -8,18 +8,19 @@ Estimated duration: ~12 minutes.
 ## Pre-demo checklist (5 min before)
 
 ```powershell
-# Terminal 1 — FastAPI backend
-cd d:\SUPPLY-CHAIN\supply_chain_copilot_
-.\venv\Scripts\Activate.ps1
-uvicorn src.api.main:app --reload --port 8000
+cd d:\gen_ai_project
+.\.venv\Scripts\Activate.ps1
 
-# Terminal 2 — Streamlit dashboard
+# Terminal 1 — Streamlit dashboard (HITL approve works in-process, no API required)
 streamlit run dashboard/app.py
+
+# Terminal 2 (optional) — FastAPI for /whatif and external API clients
+uvicorn src.api.main:app --reload --port 8000
 ```
 
 - Open browser to http://localhost:8501  
-- Confirm the sidebar shows all four scenarios and the ▶ Run pipeline button is visible.  
-- Confirm http://localhost:8000/docs loads (FastAPI Swagger UI).
+- Confirm the sidebar shows all demo scenarios and the ▶ Run pipeline button is visible.  
+- Optional: confirm http://localhost:8000/docs loads if running FastAPI (what-if page can use local tool fallback).
 
 ---
 

@@ -10,10 +10,12 @@ SEVERITY_BADGE = {
 }
 
 
-def render_alert_card(signal: dict) -> None:
+def render_alert_card(signal: dict, *, highlight: bool = False) -> None:
     """Render one demand_signal as a compact card."""
     icon, _color = SEVERITY_BADGE.get(signal["severity"], ("⚪", "#888"))
     with st.container(border=True):
+        if highlight:
+            st.caption("⭐ Demo focal SKU")
         cols = st.columns([0.5, 2.2, 1.0, 1.0, 1.0])
         cols[0].markdown(f"### {icon}")
         cols[1].markdown(f"**{signal['sku_id']}**")

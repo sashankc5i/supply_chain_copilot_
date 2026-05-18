@@ -121,6 +121,9 @@ def _resume_graph(run_id: str, payload: dict) -> None:
         import streamlit as _st
         if hasattr(_st, "session_state") and "state" in _st.session_state:
             _st.session_state.state = values
-            _st.session_state.interrupted = False
+            _st.session_state.interrupted = bool(
+                graph_app.get_state(config).tasks
+            )
+        st.rerun()
     except Exception as exc:
         st.error(f"Graph resume failed: {exc}")

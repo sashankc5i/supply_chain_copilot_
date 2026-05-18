@@ -17,6 +17,8 @@ from src.data.loaders import DATA_RUN
 st.set_page_config(page_title="HITL Approval", layout="wide")
 st.title("HITL Approval Queue")
 
+st.page_link("app.py", label="← Back to Command Center", icon="📦")
+
 log_path = DATA_RUN / "action_log.csv"
 
 _HOW_TO = """

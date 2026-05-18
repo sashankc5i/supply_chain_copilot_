@@ -77,7 +77,7 @@ run = st.sidebar.button("▶ Run pipeline", type="primary", use_container_width=
 st.sidebar.divider()
 st.sidebar.caption(
     "Pipeline: detect → [evidence → diagnose → recommend → critique → escalate] "
-    "or summarize. Start FastAPI for HITL buttons."
+    "or summarize. HITL Approve/Reject works in-process (no API required)."
 )
 
 # ---------------------------------------------------------------------------
@@ -154,9 +154,20 @@ interrupted = st.session_state.interrupted
 if interrupted:
     st.warning(
         f"⏸ **HITL pending** — graph paused at escalate. "
-        f"Use Approve / Reject / Edit below (requires FastAPI on port 8000). "
-        f"run_id=`{run_id}`"
+        f"Use Approve / Reject / Edit below. run_id=`{run_id}`"
     )
+
+_hypotheses = state.get("root_cause_hypotheses") or []
+_recs = state.get("recommendations") or []
+_llm_degraded = any(
+    "LLM call failed" in (h.get("explanation") or "")
+    for h in _hypotheses
+) or (
+    len(_recs) == 1 and _recs[0].get("confidence") == 0.5
+    and "fallback" in str(_recs[0].get("params", {})).lower()
+)
+if _llm_degraded:
+    st.warning("LLM degraded — showing fallback hypotheses/recommendations. Check Azure OpenAI in `.env`.")
 
 # KPIs
 k1, k2, k3, k4, k5, k6 = st.columns(6)
@@ -173,8 +184,9 @@ if ran_week:
     st.caption(f"Pipeline week: **{ran_week}** · run_id `{run_id}`")
 
 if state.get("exceptions"):
-    for msg in state["exceptions"]:
-        st.info(msg)
+    with st.expander("Operator summary / exceptions", expanded=True):
+        for msg in state["exceptions"]:
+            st.info(msg)
 
 st.divider()
 
@@ -193,8 +205,9 @@ with left:
     else:
         sev_rank = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
         filtered.sort(key=lambda s: (sev_rank[s["severity"]], -abs(s["zscore"])))
+        focal_sku = DEMO_SKU.get(choice) or state.get("sku_id")
         for s in filtered[:25]:
-            render_alert_card(s)
+            render_alert_card(s, highlight=bool(focal_sku and s["sku_id"] == focal_sku))
 
 with right:
     st.subheader("Focal Alert · Diagnosis & Actions")
@@ -203,7 +216,12 @@ with right:
         st.info("No HIGH-severity alerts — summarize path only.")
     else:
         if high:
-            focal = max(high, key=lambda s: abs(s["zscore"]))
+            focal_sku = DEMO_SKU.get(choice) or state.get("sku_id")
+            demo_high = [s for s in high if focal_sku and s["sku_id"] == focal_sku]
+            focal = max(
+                demo_high or high,
+                key=lambda s: abs(s["zscore"]),
+            )
             st.markdown(f"**{focal['sku_id']}** · {focal['store_id']} · {focal['region']}")
 
         if evidence:
