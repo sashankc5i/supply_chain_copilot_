@@ -35,6 +35,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from src.graph.llm import get_llm
 from src.graph.state import SupplyChainState
+from src.graph.tracing import log_node
 
 CauseType = Literal[
     "promo_effect", "weather_event", "supplier_delay", "competitor", "data_anomaly"
@@ -54,6 +55,7 @@ class _DiagnoseOutput(BaseModel):
     hypotheses: list[_Hypothesis]
 
 
+@log_node("diagnose")
 def diagnose(state: SupplyChainState) -> dict:
     """Generate ranked root-cause hypotheses for the strongest HIGH-severity signal."""
     signals = state.get("demand_signals") or []

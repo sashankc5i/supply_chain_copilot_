@@ -1,0 +1,152 @@
+[
+  {
+    "id": "demo-1",
+    "description": "SKU-1042 promo spike + heatwave (West, Week 87)",
+    "sku_id": "SKU-1042",
+    "store_id": "ST-004",
+    "week_start": "2026-01-12",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "promo_effect",
+    "expected_action_types": ["transfer_inventory", "reduce_promo"]
+  },
+  {
+    "id": "demo-2",
+    "description": "SKU-0217 supplier delay drop (South, Week 89)",
+    "sku_id": "SKU-0217",
+    "store_id": "ST-002",
+    "week_start": "2026-01-26",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "supplier_delay",
+    "expected_action_types": ["expedite_order", "transfer_inventory"]
+  },
+  {
+    "id": "demo-3",
+    "description": "SKU-0089 borderline MEDIUM (East, Week 91)",
+    "sku_id": "SKU-0089",
+    "store_id": "ST-003",
+    "week_start": "2026-02-09",
+    "ground_truth_severity": "MEDIUM",
+    "ground_truth_cause": "noise",
+    "expected_action_types": []
+  },
+  {
+    "id": "organic-1",
+    "description": "SKU-1099 data glitch (LOW)",
+    "sku_id": "SKU-1099",
+    "store_id": "ST-006",
+    "week_start": "2026-04-13",
+    "ground_truth_severity": "LOW",
+    "ground_truth_cause": "data_anomaly",
+    "expected_action_types": []
+  },
+  {
+    "id": "organic-2",
+    "description": "SKU-1038 organic anomaly (HIGH)",
+    "sku_id": "SKU-1038",
+    "store_id": "ST-045",
+    "week_start": "2025-08-04",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-3",
+    "description": "SKU-0896 organic anomaly (HIGH)",
+    "sku_id": "SKU-0896",
+    "store_id": "ST-023",
+    "week_start": "2025-03-10",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-4",
+    "description": "SKU-0290 organic anomaly (HIGH)",
+    "sku_id": "SKU-0290",
+    "store_id": "ST-025",
+    "week_start": "2024-09-30",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-5",
+    "description": "SKU-0337 organic anomaly (HIGH)",
+    "sku_id": "SKU-0337",
+    "store_id": "ST-041",
+    "week_start": "2025-12-01",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-6",
+    "description": "SKU-0780 organic anomaly (HIGH)",
+    "sku_id": "SKU-0780",
+    "store_id": "ST-001",
+    "week_start": "2025-03-24",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-7",
+    "description": "SKU-0376 organic anomaly (HIGH)",
+    "sku_id": "SKU-0376",
+    "store_id": "ST-007",
+    "week_start": "2026-03-30",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-8",
+    "description": "SKU-0599 organic anomaly (HIGH)",
+    "sku_id": "SKU-0599",
+    "store_id": "ST-025",
+    "week_start": "2025-02-10",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-9",
+    "description": "SKU-1012 organic anomaly (HIGH)",
+    "sku_id": "SKU-1012",
+    "store_id": "ST-035",
+    "week_start": "2024-11-25",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-10",
+    "description": "SKU-0775 organic anomaly (HIGH)",
+    "sku_id": "SKU-0775",
+    "store_id": "ST-045",
+    "week_start": "2025-11-10",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  },
+  {
+    "id": "organic-11",
+    "description": "SKU-1026 organic anomaly (MEDIUM)",
+    "sku_id": "SKU-1026",
+    "store_id": "ST-049",
+    "week_start": "2026-03-23",
+    "ground_truth_severity": "MEDIUM",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": []
+  },
+  {
+    "id": "organic-12",
+    "description": "SKU-0482 organic anomaly (HIGH)",
+    "sku_id": "SKU-0482",
+    "store_id": "ST-013",
+    "week_start": "2025-04-21",
+    "ground_truth_severity": "HIGH",
+    "ground_truth_cause": "unknown",
+    "expected_action_types": ["transfer_inventory", "expedite_order"]
+  }
+]

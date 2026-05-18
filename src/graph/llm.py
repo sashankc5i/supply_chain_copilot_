@@ -22,7 +22,7 @@ import os
 from functools import lru_cache
 
 from dotenv import load_dotenv
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import AzureChatOpenAI  # type: ignore[reportMissingImports]
 
 load_dotenv()
 

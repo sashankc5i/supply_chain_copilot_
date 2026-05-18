@@ -17,6 +17,10 @@ Top-level keys (all optional via `total=False`, populated incrementally):
 
 | Key                     | Type                            | Populated by         |
 |-------------------------|----------------------------------|----------------------|
+| `week_start`            | `str` (ISO Monday `YYYY-MM-DD`) | caller / `detect`    |
+| `sku_id`                | `str` (optional focal SKU)      | caller               |
+| `store_id`              | `str` (optional focal store)    | caller               |
+| `run_id`                | `str`                           | caller               |
 | `demand_signals`        | `list[DemandSignal]`            | `detect`             |
 | `inventory_positions`   | `dict[sku_id, dict[loc_id, row]]` | `detect`           |
 | `service_levels`        | `dict[sku_id, float]`           | `detect` (optional)  |
@@ -26,8 +30,7 @@ Top-level keys (all optional via `total=False`, populated incrementally):
 | `critique_result`       | `CritiqueResult`                | `critique`           |
 | `approval_status`       | `"pending"\|"approved"\|"rejected"\|"edited"\|"n/a"` | `escalate` |
 | `exceptions`            | `list[str]`                     | `summarize` (append) |
-| `retry_count`           | `int`                           | router (incremented) |
-| `run_id`                | `str` (UUID4 hex)               | caller of `app.invoke` |
+| `retry_count`           | `int`                           | `recommend` (on retry) |
 
 ### Nested dict shapes
 
