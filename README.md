@@ -83,7 +83,8 @@ scripts/            Data generators
 |---------|---------|
 | `python -m src.graph.graph` | Print graph ASCII |
 | `pytest tests/ -v` | Unit tests |
-| `streamlit run dashboard/app.py` | Command Center |
+| `python scripts/smoke_e2e.py` | Headless E2E smoke (no Streamlit) |
+| `streamlit run dashboard/app.py` | Command Center (+ **Run all 3 demos**) |
 | `python eval/run_evals.py` | Metrics run |
 
 ## Known limitations

@@ -76,7 +76,9 @@ uvicorn src.api.main:app --reload --port 8000
 
 ## Scenario 3 — Borderline MEDIUM / fast path (SKU-0089, East, Week 91)
 
-**Expected path:** MEDIUM → summarize fast path, **no HITL**.
+**Expected path:** MEDIUM (DOH ~7.5d at East stores) → summarize fast path, **no HITL**.
+
+If ST-003 shows LOW, re-run `python scripts/generate_data.py` (Demo 3 inventory uses ~7.5 DOH).
 
 ### Steps
 

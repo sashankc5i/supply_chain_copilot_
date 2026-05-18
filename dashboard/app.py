@@ -28,8 +28,11 @@ st.set_page_config(
     layout="wide",
 )
 
+from langgraph.types import Command
+
 from dashboard.components.alert_card import render_alert_card
 from dashboard.components.evidence_panel import render_evidence_panel
+from dashboard.components.export_traces import render_export_buttons
 from dashboard.components.recommendation_table import render_recommendation_table
 from dashboard.components.run_breakdown import render_run_breakdown
 from src.api.routes.alerts import set_latest_alerts
@@ -43,6 +46,45 @@ def _thread_config(run_id: str) -> dict:
 def _is_interrupted(run_id: str) -> bool:
     snap = graph_app.get_state(_thread_config(run_id))
     return bool(snap and snap.tasks)
+
+
+DEMO_BATCH = [
+    ("Demo 1 — SKU-1042", "2026-01-12", "SKU-1042"),
+    ("Demo 2 — SKU-0217", "2026-01-26", "SKU-0217"),
+    ("Demo 3 — SKU-0089", "2026-02-09", "SKU-0089"),
+]
+
+
+def _pipeline_path_label(state: dict) -> str:
+    if state.get("evidence"):
+        return "full"
+    if state.get("exceptions"):
+        return "summarize"
+    return "detect-only"
+
+
+def _run_pipeline(week_start: str, sku_id: str | None) -> tuple[dict, str, float, bool]:
+    """Invoke graph; auto-approve HITL when paused. Returns state, run_id, ms, interrupted."""
+    run_id = f"st-{uuid.uuid4().hex[:12]}"
+    config = _thread_config(run_id)
+    inputs: dict = {"run_id": run_id, "week_start": week_start}
+    if sku_id:
+        inputs["sku_id"] = sku_id
+    t0 = time.perf_counter()
+    result = graph_app.invoke(inputs, config=config)
+    if _is_interrupted(run_id):
+        result = graph_app.invoke(
+            Command(resume={
+                "decision": "approve",
+                "reason": "batch-auto-approve",
+                "approver": "dashboard",
+            }),
+            config=config,
+        )
+    elapsed_ms = (time.perf_counter() - t0) * 1000
+    state = result if isinstance(result, dict) else dict(result)
+    interrupted = _is_interrupted(run_id)
+    return state, run_id, elapsed_ms, interrupted
 
 
 # ---------------------------------------------------------------------------
@@ -73,6 +115,7 @@ else:
     week_start = chosen_date.isoformat()
 
 run = st.sidebar.button("▶ Run pipeline", type="primary", use_container_width=True)
+run_all = st.sidebar.button("▶ Run all 3 demos", use_container_width=True)
 
 st.sidebar.divider()
 st.sidebar.caption(
@@ -89,28 +132,50 @@ if "state" not in st.session_state:
     st.session_state.week_start = None
     st.session_state.timings = {}
     st.session_state.interrupted = False
+    st.session_state.batch_results = None
+
+if run_all:
+    batch_rows = []
+    last_state = None
+    last_run_id = None
+    last_week = None
+    last_interrupted = False
+    progress = st.sidebar.progress(0, text="Batch demos...")
+    try:
+        for i, (label, week, sku) in enumerate(DEMO_BATCH):
+            state, run_id, ms, interrupted = _run_pipeline(week, sku)
+            high_n = sum(1 for s in state.get("demand_signals", []) if s["severity"] == "HIGH")
+            batch_rows.append({
+                "scenario": label,
+                "week_start": week,
+                "path": _pipeline_path_label(state),
+                "HIGH_alerts": high_n,
+                "approval": state.get("approval_status", "n/a"),
+                "latency_ms": round(ms),
+                "run_id": run_id,
+                "interrupted": interrupted,
+            })
+            last_state, last_run_id, last_week, last_interrupted = state, run_id, week, interrupted
+            progress.progress((i + 1) / len(DEMO_BATCH), text=f"Done {label}")
+        st.session_state.batch_results = batch_rows
+        st.session_state.state = last_state
+        st.session_state.run_id = last_run_id
+        st.session_state.week_start = last_week
+        st.session_state.interrupted = last_interrupted
+        st.session_state.timings = {"pipeline_ms": batch_rows[-1]["latency_ms"]}
+    except Exception as exc:
+        st.sidebar.error(f"Batch failed: {exc}")
 
 if run:
-    run_id = f"st-{uuid.uuid4().hex[:12]}"
-    timings: dict[str, float] = {}
-    config = _thread_config(run_id)
-    inputs: dict = {"run_id": run_id, "week_start": week_start}
     demo_sku = DEMO_SKU.get(choice)
-    if demo_sku:
-        inputs["sku_id"] = demo_sku
-
-    t0 = time.perf_counter()
     try:
         with st.spinner("Running LangGraph pipeline..."):
-            result = graph_app.invoke(inputs, config=config)
-        timings["pipeline_ms"] = (time.perf_counter() - t0) * 1000
-        interrupted = _is_interrupted(run_id)
-        state = result if isinstance(result, dict) else dict(result)
+            state, run_id, elapsed_ms, interrupted = _run_pipeline(week_start, demo_sku)
         set_latest_alerts(run_id, state.get("demand_signals", []))
         st.session_state.state = state
         st.session_state.run_id = run_id
         st.session_state.week_start = week_start
-        st.session_state.timings = timings
+        st.session_state.timings = {"pipeline_ms": elapsed_ms}
         st.session_state.interrupted = interrupted
         if interrupted:
             st.session_state.pending_hitl = {
@@ -136,6 +201,12 @@ if (
         f"Sidebar week is **{week_start}** but results are from "
         f"**{st.session_state.week_start}**. Click **Run pipeline** to refresh."
     )
+
+if st.session_state.batch_results:
+    st.subheader("Batch demo results")
+    import pandas as pd
+    st.dataframe(pd.DataFrame(st.session_state.batch_results), use_container_width=True, hide_index=True)
+    st.divider()
 
 if st.session_state.state is None:
     st.info("👈 Pick a scenario in the sidebar and click ▶ Run pipeline.")
@@ -269,3 +340,7 @@ with st.expander("🔍 Run breakdown (node trace)", expanded=False):
         render_run_breakdown(run_id)
     else:
         st.info("Run a pipeline first to see the node trace.")
+
+st.divider()
+st.subheader("Export audit trail")
+render_export_buttons(run_id)

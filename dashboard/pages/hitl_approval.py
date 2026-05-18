@@ -1,4 +1,4 @@
-"""HITL approval page -- pending and resolved action log tabs."""
+"""HITL approval page -- pending controls + resolved action log."""
 from __future__ import annotations
 
 import sys
@@ -13,59 +13,46 @@ import streamlit as st
 
 from src.api.action_log import action_log_needs_header
 from src.data.loaders import DATA_RUN
+from dashboard.components.hitl_controls import render_hitl_controls
+from dashboard.components.export_traces import render_export_buttons
 
 st.set_page_config(page_title="HITL Approval", layout="wide")
 st.title("HITL Approval Queue")
 
-st.page_link("app.py", label="← Back to Command Center", icon="📦")
+st.page_link("app.py", label="Back to Command Center", icon="📦")
 
 log_path = DATA_RUN / "action_log.csv"
-
-_HOW_TO = """
-**This page fills after you complete a human approval — not from running detect alone.**
-
-1. Open **Command Center** (main app page).
-2. Run **Demo 1** or **Demo 2** (HIGH severity) and wait for the pipeline to finish or pause at HITL.
-3. Start the API: `uvicorn src.api.main:app --reload --port 8000`
-4. On Command Center, click **Approve**, **Reject**, or **Edit** on the recommendation.
-
-Each approve/reject appends a row to `data/runtime/action_log.csv` and shows here under **Resolved**.
-"""
-
-if not log_path.exists():
-    st.info("No action log file yet.")
-    st.markdown(_HOW_TO)
-    st.stop()
-
-if action_log_needs_header(log_path):
-    st.info("No actions logged yet.")
-    st.markdown(_HOW_TO)
-    st.stop()
-
-df = pd.read_csv(log_path)
-if df.empty:
-    st.info("No approvals recorded yet — the log file has only a header row.")
-    st.markdown(_HOW_TO)
-    st.stop()
-
 pending = st.session_state.get("pending_hitl")
 tab_pending, tab_resolved = st.tabs(["Pending (session)", "Resolved (action log)"])
 
 with tab_pending:
     if pending:
-        st.json(pending)
-        st.caption(f"run_id: `{pending.get('run_id')}` — use Approve/Reject on Command Center (API required).")
+        run_id = pending.get("run_id", "")
+        top = pending.get("top_action") or {}
+        st.caption(f"run_id: `{run_id}`")
+        if top:
+            st.json(top)
+            render_hitl_controls(top, run_id, key_prefix="hitl-page")
+        else:
+            st.info("No top action in pending payload — open Command Center and re-run a HIGH scenario.")
     else:
         st.info(
-            "No pending HITL in this browser session. "
-            "Run a HIGH-severity scenario on **Command Center**; if the graph pauses for HITL, "
-            "approve there first."
+            "No pending HITL in this session. Run Demo 1 or Demo 2 on **Command Center** "
+            "and wait for the HITL banner before approving here."
         )
 
 with tab_resolved:
-    st.caption(f"{len(df)} decision(s) logged")
-    st.dataframe(
-        df.sort_values("timestamp", ascending=False),
-        use_container_width=True,
-        hide_index=True,
-    )
+    if not log_path.exists() or action_log_needs_header(log_path):
+        st.info("No actions logged yet. Approve or reject on Command Center first.")
+    else:
+        df = pd.read_csv(log_path)
+        if df.empty:
+            st.info("Action log has only a header — complete an approval to add rows.")
+        else:
+            st.caption(f"{len(df)} decision(s) logged")
+            st.dataframe(
+                df.sort_values("timestamp", ascending=False),
+                use_container_width=True,
+                hide_index=True,
+            )
+            render_export_buttons(st.session_state.get("run_id"))

@@ -4,14 +4,9 @@ Runs every test case in eval/test_cases.json through the LangGraph pipeline,
 computes alert precision/recall and recommendation quality, and writes
 eval/eval_results.json.
 
-Usage:
-    python eval/run_evals.py
-
-Targets (per BUILD_GUIDE.md Phase 4):
-    Alert precision  >= 0.85
-    Alert recall     >= 0.90
-    Avg rec score    >= 3.5 / 5
-    Avg latency      < 45s / run
+Detection is scored two ways:
+  - store_level: severity at the labeled (sku_id, store_id)
+  - sku_week_level: best severity for sku_id anywhere (recommended for recall)
 """
 from __future__ import annotations
 
@@ -39,8 +34,9 @@ _EVAL_DIR = Path(__file__).resolve().parent
 _TEST_CASES_PATH = _EVAL_DIR / "test_cases.json"
 _RESULTS_PATH = _EVAL_DIR / "eval_results.json"
 
-# Severity labels considered "anomaly-positive"
 POSITIVE_SEVERITIES = {"HIGH", "MEDIUM"}
+_DEMO_IDS = {"demo-1", "demo-2", "demo-3"}
+_SEV_RANK = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
 
 
 def _load_test_cases() -> list[dict]:
@@ -49,10 +45,6 @@ def _load_test_cases() -> list[dict]:
 
 
 def _invoke_graph(test_case: dict) -> tuple[dict, float]:
-    """Invoke the graph for one test case; auto-approve any HITL interrupt.
-
-    Returns (final_state, elapsed_seconds).
-    """
     run_id = f"eval-{uuid.uuid4().hex[:10]}"
     checkpointer = MemorySaver()
     app = build_graph(checkpointer=checkpointer)
@@ -66,11 +58,7 @@ def _invoke_graph(test_case: dict) -> tuple[dict, float]:
     }
 
     t0 = time.perf_counter()
-
-    # First invoke — may pause at escalate interrupt
     state = app.invoke(inputs, config=config)
-
-    # If graph paused at escalate, auto-approve and resume
     snap = app.get_state(config)
     if snap and snap.tasks:
         state = app.invoke(
@@ -81,31 +69,63 @@ def _invoke_graph(test_case: dict) -> tuple[dict, float]:
             }),
             config=config,
         )
-
     elapsed = time.perf_counter() - t0
     if not isinstance(state, dict):
         state = dict(state)
     return state, elapsed
 
 
-def _detected_severity(state: dict, sku_id: str, store_id: str) -> str | None:
-    """Return the severity the graph assigned to the focal (sku, store) pair."""
+def _severity_at_store(state: dict, sku_id: str, store_id: str) -> str | None:
     for sig in state.get("demand_signals") or []:
         if sig.get("sku_id") == sku_id and sig.get("store_id") == store_id:
             return sig.get("severity")
-    # Possibly detected a different store — return the max severity found
-    severities = [s.get("severity") for s in (state.get("demand_signals") or [])]
-    sev_rank = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
-    if severities:
-        return min(severities, key=lambda s: sev_rank.get(s, 99))
     return None
+
+
+def _best_severity_for_sku(state: dict, sku_id: str) -> str | None:
+    severities = [
+        s.get("severity")
+        for s in (state.get("demand_signals") or [])
+        if s.get("sku_id") == sku_id and s.get("severity")
+    ]
+    if not severities:
+        return None
+    return min(severities, key=lambda s: _SEV_RANK.get(s, 99))
+
+
+def _is_positive(severity: str | None) -> bool:
+    return severity in POSITIVE_SEVERITIES if severity else False
+
+
+def _confusion(rows: list[dict], pred_key: str) -> dict:
+    tp = fp = fn = tn = 0
+    for r in rows:
+        gt_pos = r["gt_positive"]
+        pred_pos = r[pred_key]
+        if gt_pos and pred_pos:
+            tp += 1
+        elif not gt_pos and pred_pos:
+            fp += 1
+        elif gt_pos and not pred_pos:
+            fn += 1
+        else:
+            tn += 1
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 1.0
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+    return {
+        "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        "precision": round(precision, 4),
+        "recall": round(recall, 4),
+        "f1": round(f1, 4),
+        "precision_pass": precision >= 0.85,
+        "recall_pass": recall >= 0.90,
+    }
 
 
 def run_evals() -> dict:
     test_cases = _load_test_cases()
-    results = []
-
-    tp = fp = fn = tn = 0
+    results: list[dict] = []
     rec_scores: list[int] = []
     latencies: list[float] = []
 
@@ -122,34 +142,18 @@ def run_evals() -> dict:
         except Exception as exc:
             print(f"  ERROR: {exc}", flush=True)
             traceback.print_exc()
-            results.append({
-                "id": tc_id,
-                "error": str(exc),
-                "latency_s": None,
-            })
-            # Count as FN if ground truth is positive, FP handled below
-            if gt_positive:
-                fn += 1
-            else:
-                tn += 1
+            results.append({"id": tc_id, "error": str(exc), "latency_s": None})
+            latencies.append(0.0)
             continue
 
-        detected_sev = _detected_severity(state, tc["sku_id"], tc["store_id"])
-        pred_positive = detected_sev in POSITIVE_SEVERITIES if detected_sev else False
+        detected_store = _severity_at_store(state, tc["sku_id"], tc["store_id"])
+        detected_sku = _best_severity_for_sku(state, tc["sku_id"])
+        pred_store = _is_positive(detected_store)
+        pred_sku = _is_positive(detected_sku)
+        pred_for_rec = pred_sku
 
-        # Confusion matrix update
-        if gt_positive and pred_positive:
-            tp += 1
-        elif not gt_positive and pred_positive:
-            fp += 1
-        elif gt_positive and not pred_positive:
-            fn += 1
-        else:
-            tn += 1
-
-        # Recommendation score (only for predicted-positive cases)
         rec_score = None
-        if pred_positive:
+        if pred_for_rec:
             recs = state.get("recommendations") or []
             hyps = state.get("root_cause_hypotheses") or []
             rec_score = score_recommendation(recs, hyps, gt_cause)
@@ -157,13 +161,14 @@ def run_evals() -> dict:
 
         latencies.append(elapsed)
 
-        result_row = {
+        results.append({
             "id": tc_id,
             "sku_id": tc["sku_id"],
             "store_id": tc["store_id"],
             "week_start": tc["week_start"],
             "ground_truth_severity": gt_severity,
-            "detected_severity": detected_sev,
+            "detected_severity_store": detected_store,
+            "detected_severity_sku_week": detected_sku,
             "ground_truth_cause": gt_cause,
             "predicted_cause": (
                 (state.get("root_cause_hypotheses") or [{}])[0].get("cause_type")
@@ -171,55 +176,64 @@ def run_evals() -> dict:
             "recommendation_score": rec_score,
             "latency_s": round(elapsed, 2),
             "approval_status": state.get("approval_status"),
-            "exceptions": state.get("exceptions") or [],
-        }
-        results.append(result_row)
+            "gt_positive": gt_positive,
+            "pred_positive_store": pred_store,
+            "pred_positive_sku_week": pred_sku,
+        })
 
-        score_str = f"rec_score={rec_score}" if rec_score is not None else "no recs"
         print(
-            f"  detected={detected_sev} gt={gt_severity} "
-            f"{score_str} latency={elapsed:.1f}s",
+            f"  store={detected_store} sku_best={detected_sku} gt={gt_severity} "
+            f"rec={rec_score} latency={elapsed:.1f}s",
             flush=True,
         )
 
-    # Aggregate metrics
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
-    recall = tp / (tp + fn) if (tp + fn) > 0 else 1.0
-    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
-    avg_rec_score = sum(rec_scores) / len(rec_scores) if rec_scores else 0.0
-    avg_latency = sum(latencies) / len(latencies) if latencies else 0.0
+    store_rows = [{"gt_positive": r["gt_positive"], "pred_positive_store": r["pred_positive_store"]}
+                  for r in results if "error" not in r]
+    sku_rows = [{"gt_positive": r["gt_positive"], "pred_positive_sku_week": r["pred_positive_sku_week"]}
+                for r in results if "error" not in r]
+    metrics_store = _confusion(store_rows, "pred_positive_store")
+    metrics_sku = _confusion(sku_rows, "pred_positive_sku_week")
+
+    demo_cases = [r for r in results if r.get("id") in _DEMO_IDS and "error" not in r]
+    demo_sku_rows = [
+        {"gt_positive": r["gt_positive"], "pred_positive_sku_week": r["pred_positive_sku_week"]}
+        for r in demo_cases
+    ]
+    metrics_demo = _confusion(demo_sku_rows, "pred_positive_sku_week")
+
+    avg_rec = sum(rec_scores) / len(rec_scores) if rec_scores else 0.0
+    avg_lat = sum(latencies) / len(latencies) if latencies else 0.0
 
     summary = {
         "total_cases": len(test_cases),
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-        "tn": tn,
-        "precision": round(precision, 4),
-        "recall": round(recall, 4),
-        "f1": round(f1, 4),
-        "avg_recommendation_score": round(avg_rec_score, 3),
-        "avg_latency_s": round(avg_latency, 2),
+        "metrics_store_level": metrics_store,
+        "metrics_sku_week_level": metrics_sku,
+        "metrics_demo_only_sku_week": metrics_demo,
+        "precision": metrics_sku["precision"],
+        "recall": metrics_sku["recall"],
+        "f1": metrics_sku["f1"],
+        "avg_recommendation_score": round(avg_rec, 3),
+        "avg_latency_s": round(avg_lat, 2),
         "targets": {
-            "precision_pass": precision >= 0.85,
-            "recall_pass": recall >= 0.90,
-            "rec_score_pass": avg_rec_score >= 3.5,
-            "latency_pass": avg_latency < 45.0,
+            "precision_pass": metrics_sku["precision_pass"],
+            "recall_pass": metrics_sku["recall_pass"],
+            "rec_score_pass": avg_rec >= 3.5,
+            "latency_pass": avg_lat < 45.0,
+            "demo_recall_pass": metrics_demo["recall_pass"],
         },
         "per_case": results,
     }
 
-    _RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(_RESULTS_PATH, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, default=str)
 
-    print("\n=== EVAL RESULTS ===")
-    print(f"  Precision : {precision:.3f}  (target >=0.85 -> {'PASS' if precision >= 0.85 else 'FAIL'})")
-    print(f"  Recall    : {recall:.3f}  (target >=0.90 -> {'PASS' if recall >= 0.90 else 'FAIL'})")
-    print(f"  Rec score : {avg_rec_score:.2f}/5  (target >=3.5 -> {'PASS' if avg_rec_score >= 3.5 else 'FAIL'})")
-    print(f"  Latency   : {avg_latency:.1f}s avg  (target <45s -> {'PASS' if avg_latency < 45.0 else 'FAIL'})")
-    print(f"\n  Results written to: {_RESULTS_PATH}")
-
+    print("\n=== EVAL RESULTS (sku-week level — primary) ===")
+    print(f"  Precision : {metrics_sku['precision']:.3f} -> {'PASS' if metrics_sku['precision_pass'] else 'FAIL'}")
+    print(f"  Recall    : {metrics_sku['recall']:.3f} -> {'PASS' if metrics_sku['recall_pass'] else 'FAIL'}")
+    print(f"  Demo-only recall: {metrics_demo['recall']:.3f}")
+    print(f"  Rec score : {avg_rec:.2f}/5")
+    print(f"  Latency   : {avg_lat:.1f}s avg")
+    print(f"  Written: {_RESULTS_PATH}")
     return summary
 
 

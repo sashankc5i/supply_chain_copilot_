@@ -491,7 +491,8 @@ def generate_inventory_snapshot(sku_df: pd.DataFrame, loc_df: pd.DataFrame,
                 elif sku == "SKU-0217" and loc.region == "South":
                     on_hand = max(avg_weekly, 30) * (4.8 / 7)
                 elif sku == "SKU-0089" and loc.region == "East":
-                    on_hand = max(avg_weekly, 20) * (18.0 / 7)
+                    # ~7.5 DOH -> MEDIUM severity (5-10d band) for Demo 3 summarize path
+                    on_hand = max(avg_weekly, 20) * (7.5 / 7)
 
             daily_demand = max(avg_weekly / 7.0, 0.1)
             doh = round(on_hand / daily_demand, 2) if daily_demand > 0 else 999.0
